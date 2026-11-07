@@ -32,7 +32,7 @@ wandb/
 
 # Large raw datasets and uncompressed memory-mapped binary arrays (200+ MB)
 # PathMNIST data can be re-acquired via `python scripts/initialize_experiment.py`
-data/
+/data/
 *.npz
 *.npy
 

@@ -48,7 +48,7 @@ def get_git_commit_hash() -> str:
         return "c6159b0_untracked"
 
 
-def execute_seed_experiment(seed: int, num_rounds: int = 30) -> dict:
+def execute_seed_experiment(seed: int, num_rounds: int = 30, attempt: int = 1, force: bool = False) -> dict:
     """
     Executes a complete paired FedAvg and FedProx experiment for a specific seed.
     Guarantees isolated directory storage, immutable metadata, zero checkpoint reuse,
@@ -57,52 +57,75 @@ def execute_seed_experiment(seed: int, num_rounds: int = 30) -> dict:
     t_seed_start_mono = time.perf_counter()
     iso_start_time = datetime.datetime.now(datetime.timezone.utc).isoformat()
     git_hash = get_git_commit_hash()
-    
+
+    dir_name = f"seed_{seed}" if attempt == 1 else f"seed_{seed}_attempt_{attempt}"
+    seed_dir = os.path.join(PROJ_ROOT, "experiments", dir_name)
+
+    # Safety guard: Prevent accidental overwrite of existing completed or partial experiments
+    if os.path.exists(seed_dir) and not force:
+        existing_entries = [f for f in os.listdir(seed_dir) if f != "run_status.json"]
+        if len(existing_entries) > 0:
+            raise FileExistsError(
+                f"Safety Guard: Experiment directory '{seed_dir}' already exists and contains artifacts! "
+                f"Aborting execution to prevent accidental overwriting. "
+                f"To run a subsequent attempt, specify: --attempt {attempt + 1}, "
+                f"or pass --force to overwrite intentionally."
+            )
+
     print(f"\n{'='*75}", flush=True)
     print(f"   EXECUTING IMMUTABLE PAIRED EXPERIMENT: SEED {seed} ({num_rounds} ROUNDS)   ", flush=True)
-    print(f"   Git Commit: {git_hash} | Start UTC: {iso_start_time}", flush=True)
+    print(f"   Directory: {dir_name} | Git Commit: {git_hash} | Start UTC: {iso_start_time}", flush=True)
     print(f"{'='*75}\n", flush=True)
-    
-    seed_dir = os.path.join(PROJ_ROOT, "experiments", f"seed_{seed}")
+
     config_dir = os.path.join(seed_dir, "configs")
     ckpt_dir = os.path.join(seed_dir, "checkpoints")
     log_dir = os.path.join(seed_dir, "logs")
     results_dir = os.path.join(seed_dir, "results")
     status_file = os.path.join(seed_dir, "run_status.json")
-    
+
     os.makedirs(config_dir, exist_ok=True)
     os.makedirs(ckpt_dir, exist_ok=True)
     os.makedirs(log_dir, exist_ok=True)
     os.makedirs(results_dir, exist_ok=True)
-    
+
     # Initialize run status tracker
     status_data = {
         "status": "INITIALIZING",
         "seed": seed,
+        "attempt": attempt,
         "current_stage": "DATA_PREPARATION",
         "start_utc": iso_start_time,
         "last_update_utc": datetime.datetime.now(datetime.timezone.utc).isoformat()
     }
     with open(status_file, "w", encoding="utf-8") as f:
         json.dump(status_data, f, indent=2)
-    
+
     # 1. Dataset Checksum & In-RAM Data Loading
     t_data_0 = time.perf_counter()
     raw_npz_path = os.path.join(PROJ_ROOT, "data", "pathmnist.npz")
-    dataset_sha256 = compute_file_sha256(raw_npz_path) if os.path.exists(raw_npz_path) else "unknown"
-    
     mmap_dir = os.path.join(PROJ_ROOT, "data", "pathmnist_mmap")
+    train_images_path = os.path.join(mmap_dir, "train_images.npy")
+
+    # Clear setup verification guard
+    if not os.path.exists(raw_npz_path) or not os.path.exists(train_images_path):
+        raise FileNotFoundError(
+            f"PathMNIST dataset not initialized at '{raw_npz_path}'! "
+            f"Please run 'python scripts/initialize_experiment.py' first to acquire "
+            f"and verify the official PathMNIST dataset."
+        )
+
+    dataset_sha256 = compute_file_sha256(raw_npz_path)
     train_images = np.load(os.path.join(mmap_dir, "train_images.npy"))
     train_labels = np.load(os.path.join(mmap_dir, "train_labels.npy"))
     val_images = np.load(os.path.join(mmap_dir, "val_images.npy"))
     val_labels = np.load(os.path.join(mmap_dir, "val_labels.npy"))
-    test_images, test_labels = get_test_data()
-    
+    # Note: test_images and test_labels are strictly quarantined and loaded only post-training
+
     # 2. Partitioning & Noise Injection for this Seed
     part_manifest_path = os.path.join(config_dir, "partition_manifest.json")
     val_manifest_path = os.path.join(config_dir, "validation_manifest.json")
     noise_manifest_path = os.path.join(config_dir, "noise_manifest.json")
-    
+
     train_partitions = generate_dirichlet_partitions(
         labels=train_labels,
         num_clients=5,
@@ -111,7 +134,7 @@ def execute_seed_experiment(seed: int, num_rounds: int = 30) -> dict:
         manifest_path=part_manifest_path
     )
     partition_manifest_sha256 = compute_file_sha256(part_manifest_path)
-    
+
     val_shards = generate_client_validation_shards(
         val_labels=val_labels,
         train_partitions=train_partitions,
@@ -121,7 +144,7 @@ def execute_seed_experiment(seed: int, num_rounds: int = 30) -> dict:
         manifest_path=val_manifest_path
     )
     val_manifest_sha256 = compute_file_sha256(val_manifest_path)
-    
+
     c5_noisy, noise_mask, _ = inject_symmetric_label_noise(
         client_train_indices=train_partitions[4],
         train_labels=train_labels,
@@ -134,10 +157,10 @@ def execute_seed_experiment(seed: int, num_rounds: int = 30) -> dict:
     )
     noise_manifest_sha256 = compute_file_sha256(noise_manifest_path)
     client_noisy_labels = {4: c5_noisy}
-    
+
     data_prep_overhead_sec = float(round(time.perf_counter() - t_data_0, 3))
     print(f"Data partitioning & setup complete ({data_prep_overhead_sec}s). Partition SHA: {partition_manifest_sha256[:12]}...")
-    
+
     # 3. Canonical Shared Initial Model Checkpoint
     torch.manual_seed(seed)
     init_model = CompactPathCNN(in_channels=3, num_classes=9)
@@ -146,12 +169,12 @@ def execute_seed_experiment(seed: int, num_rounds: int = 30) -> dict:
     torch.save(init_model.state_dict(), init_ckpt_path)
     init_model_sha256 = compute_file_sha256(init_ckpt_path)
     print(f"Initial model instantiated: SHA-256 = {init_model_sha256}")
-    
+
     # 4. Primary Run 1: FedAvg
     fedavg_run_name = f"fedavg_alpha0.3_noise40_seed{seed}"
     model_fedavg = CompactPathCNN(in_channels=3, num_classes=9)
     model_fedavg.load_state_dict(torch.load(init_ckpt_path))
-    
+
     status_data.update({
         "status": "RUNNING_FEDAVG",
         "current_stage": "FEDAVG_TRAINING",
@@ -159,7 +182,7 @@ def execute_seed_experiment(seed: int, num_rounds: int = 30) -> dict:
     })
     with open(status_file, "w", encoding="utf-8") as f:
         json.dump(status_data, f, indent=2)
-    
+
     t0_avg = time.perf_counter()
     iso_avg_start = datetime.datetime.now(datetime.timezone.utc).isoformat()
     res_fedavg = run_fedavg(
@@ -183,7 +206,7 @@ def execute_seed_experiment(seed: int, num_rounds: int = 30) -> dict:
     )
     dur_avg_sec = float(round(time.perf_counter() - t0_avg, 3))
     iso_avg_end = datetime.datetime.now(datetime.timezone.utc).isoformat()
-    
+
     status_data.update({
         "status": "COMPLETED_FEDAVG",
         "current_stage": "FEDPROX_TRAINING",
@@ -193,12 +216,12 @@ def execute_seed_experiment(seed: int, num_rounds: int = 30) -> dict:
     })
     with open(status_file, "w", encoding="utf-8") as f:
         json.dump(status_data, f, indent=2)
-    
+
     # 5. Primary Run 2: FedProx (mu=0.01)
     fedprox_run_name = f"fedprox_mu0.01_alpha0.3_noise40_seed{seed}"
     model_fedprox = CompactPathCNN(in_channels=3, num_classes=9)
     model_fedprox.load_state_dict(torch.load(init_ckpt_path))
-    
+
     t0_prox = time.perf_counter()
     iso_prox_start = datetime.datetime.now(datetime.timezone.utc).isoformat()
     res_fedprox = run_fedprox(
@@ -223,7 +246,7 @@ def execute_seed_experiment(seed: int, num_rounds: int = 30) -> dict:
     )
     dur_prox_sec = float(round(time.perf_counter() - t0_prox, 3))
     iso_prox_end = datetime.datetime.now(datetime.timezone.utc).isoformat()
-    
+
     status_data.update({
         "status": "COMPLETED_FEDPROX",
         "current_stage": "HELD_OUT_TEST_EVALUATION",
@@ -233,28 +256,31 @@ def execute_seed_experiment(seed: int, num_rounds: int = 30) -> dict:
     })
     with open(status_file, "w", encoding="utf-8") as f:
         json.dump(status_data, f, indent=2)
-    
+
     # 6. Strict Post-Training Held-Out Test Evaluation
+    print("Loading quarantined official test split (7,180 samples) for final post-training evaluation...", flush=True)
+    test_images, test_labels = get_test_data()
+
     fedavg_best_ckpt = os.path.join(ckpt_dir, f"{fedavg_run_name}_best.pt")
     fedprox_best_ckpt = os.path.join(ckpt_dir, f"{fedprox_run_name}_best.pt")
-    
+
     pred_avg_path = os.path.join(results_dir, "fedavg_test_predictions.jsonl")
     pred_prox_path = os.path.join(results_dir, "fedprox_test_predictions.jsonl")
     cm_avg_path = os.path.join(results_dir, "fedavg_confusion_matrix.json")
     cm_prox_path = os.path.join(results_dir, "fedprox_confusion_matrix.json")
-    
+
     test_metrics_avg = evaluate_checkpoint_on_test(fedavg_best_ckpt, test_images, test_labels, pred_avg_path)
     test_metrics_prox = evaluate_checkpoint_on_test(fedprox_best_ckpt, test_images, test_labels, pred_prox_path)
-    
+
     with open(cm_avg_path, "w", encoding="utf-8") as f:
         json.dump(test_metrics_avg["confusion_matrix"], f, indent=2)
     with open(cm_prox_path, "w", encoding="utf-8") as f:
         json.dump(test_metrics_prox["confusion_matrix"], f, indent=2)
-        
+
     # 7. Exact Timing Reconciliation
     avg_jsonl = os.path.join(log_dir, f"{fedavg_run_name}_metrics.jsonl")
     prox_jsonl = os.path.join(log_dir, f"{fedprox_run_name}_metrics.jsonl")
-    
+
     def parse_round_times(jsonl_path):
         round_times = []
         train_times = []
@@ -269,7 +295,7 @@ def execute_seed_experiment(seed: int, num_rounds: int = 30) -> dict:
 
     avg_round_times, avg_train_times = parse_round_times(avg_jsonl)
     prox_round_times, prox_train_times = parse_round_times(prox_jsonl)
-    
+
     timing_reconciliation = {
         "fedavg": {
             "wall_clock_total_seconds": dur_avg_sec,
@@ -291,7 +317,7 @@ def execute_seed_experiment(seed: int, num_rounds: int = 30) -> dict:
         "total_seed_wall_clock_seconds": float(round(time.perf_counter() - t_seed_start_mono, 3)),
         "total_seed_wall_clock_minutes": float(round((time.perf_counter() - t_seed_start_mono) / 60.0, 2))
     }
-    
+
     # 8. Immutable Experiment Identity Metadata
     iso_end_time = datetime.datetime.now(datetime.timezone.utc).isoformat()
     seed_metadata = {
@@ -331,11 +357,11 @@ def execute_seed_experiment(seed: int, num_rounds: int = 30) -> dict:
         },
         "timing_reconciliation": timing_reconciliation
     }
-    
+
     meta_path = os.path.join(seed_dir, "metadata.json")
     with open(meta_path, "w", encoding="utf-8") as f:
         json.dump(seed_metadata, f, indent=2)
-        
+
     seed_summary = {
         "seed": seed,
         "git_commit_hash": git_hash,
@@ -372,11 +398,11 @@ def execute_seed_experiment(seed: int, num_rounds: int = 30) -> dict:
         },
         "timing_reconciliation": timing_reconciliation
     }
-    
+
     summary_path = os.path.join(results_dir, "seed_summary.json")
     with open(summary_path, "w", encoding="utf-8") as f:
         json.dump(seed_summary, f, indent=2)
-        
+
     status_data.update({
         "status": "COMPLETED",
         "current_stage": "FINISHED",
@@ -386,7 +412,7 @@ def execute_seed_experiment(seed: int, num_rounds: int = 30) -> dict:
     })
     with open(status_file, "w", encoding="utf-8") as f:
         json.dump(status_data, f, indent=2)
-        
+
     print(f"\n{'='*75}", flush=True)
     print(f"   SEED {seed} EXECUTION SUMMARY", flush=True)
     print(f"   FedAvg  (Round {res_fedavg['best_round']:02d}): Test Acc = {test_metrics_avg['overall_accuracy']*100:.3f}% | Macro-F1 = {test_metrics_avg['macro_f1']:.4f} | Time: {timing_reconciliation['fedavg']['wall_clock_minutes']}m", flush=True)
@@ -403,25 +429,25 @@ def consolidate_multi_seed_results(completed_summaries: list) -> dict:
     """
     if not completed_summaries:
         return {}
-        
+
     global_results_dir = os.path.join(PROJ_ROOT, "experiments", "results")
     os.makedirs(global_results_dir, exist_ok=True)
-    
+
     seeds = [s["seed"] for s in completed_summaries]
     n_seeds = len(completed_summaries)
-    
+
     avg_test_accs = [s["fedavg"]["test_accuracy"] for s in completed_summaries]
     avg_macro_f1s = [s["fedavg"]["test_macro_f1"] for s in completed_summaries]
     avg_bal_accs = [s["fedavg"]["test_balanced_accuracy"] for s in completed_summaries]
-    
+
     prox_test_accs = [s["fedprox"]["test_accuracy"] for s in completed_summaries]
     prox_macro_f1s = [s["fedprox"]["test_macro_f1"] for s in completed_summaries]
     prox_bal_accs = [s["fedprox"]["test_balanced_accuracy"] for s in completed_summaries]
-    
+
     paired_acc_deltas = [p - a for a, p in zip(avg_test_accs, prox_test_accs)]
     paired_f1_deltas = [p - a for a, p in zip(avg_macro_f1s, prox_macro_f1s)]
     paired_bal_deltas = [p - a for a, p in zip(avg_bal_accs, prox_bal_accs)]
-    
+
     def calc_stats(vals):
         arr = np.array(vals)
         return {
@@ -432,7 +458,7 @@ def consolidate_multi_seed_results(completed_summaries: list) -> dict:
             "max": float(round(float(np.max(arr)), 5)),
             "range": float(round(float(np.max(arr) - np.min(arr)), 5))
         }
-        
+
     consolidation = {
         "num_completed_seeds": n_seeds,
         "completed_seeds": seeds,
@@ -456,12 +482,12 @@ def consolidate_multi_seed_results(completed_summaries: list) -> dict:
             }
         }
     }
-    
+
     # Save consolidated JSON
     out_json = os.path.join(global_results_dir, "multiseed_consolidated_summary.json")
     with open(out_json, "w", encoding="utf-8") as f:
         json.dump(consolidation, f, indent=2)
-        
+
     # Save consolidated CSV
     out_csv = os.path.join(global_results_dir, "multiseed_consolidated_summary.csv")
     with open(out_csv, "w", encoding="utf-8") as f:
@@ -470,24 +496,26 @@ def consolidate_multi_seed_results(completed_summaries: list) -> dict:
             sd = s["seed"]
             f.write(f"{sd},FedAvg,{s['fedavg']['best_validation_accuracy']:.5f},{s['fedavg']['test_accuracy']:.5f},{s['fedavg']['test_macro_f1']:.5f},{s['fedavg']['test_balanced_accuracy']:.5f},{s['fedavg']['wall_clock_minutes']}\n")
             f.write(f"{sd},FedProx,{s['fedprox']['best_validation_accuracy']:.5f},{s['fedprox']['test_accuracy']:.5f},{s['fedprox']['test_macro_f1']:.5f},{s['fedprox']['test_balanced_accuracy']:.5f},{s['fedprox']['wall_clock_minutes']}\n")
-            
+
     print(f"Consolidated multi-seed results saved to {out_json} and {out_csv}")
     return consolidation
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Multi-Seed FL Orchestrator")
-    parser.add_argument("--seeds", type=int, nargs="+", default=[42], help="List of seeds to execute")
-    parser.add_argument("--rounds", type=int, default=30, help="Number of communication rounds per algorithm")
+    parser = argparse.ArgumentParser(description="Multi-Seed FL Orchestrator for PathMNIST FedAvg vs FedProx")
+    parser.add_argument("--seeds", type=int, nargs="+", default=[42], help="List of random seeds to execute sequentially (default: [42])")
+    parser.add_argument("--rounds", type=int, default=30, help="Number of communication rounds per algorithm (default: 30)")
+    parser.add_argument("--attempt", type=int, default=1, help="Attempt identifier for isolating repeat executions without overwriting (default: 1)")
+    parser.add_argument("--force", action="store_true", help="Force overwrite if destination experiment directory already exists")
     args = parser.parse_args()
-    
-    print(f"Starting Multi-Seed FL Execution: Seeds = {args.seeds}, Rounds = {args.rounds}")
-    
+
+    print(f"Starting Multi-Seed FL Execution: Seeds = {args.seeds}, Rounds = {args.rounds}, Attempt = {args.attempt}, Force = {args.force}", flush=True)
+
     completed_summaries = []
     for s in args.seeds:
-        summary = execute_seed_experiment(seed=s, num_rounds=args.rounds)
+        summary = execute_seed_experiment(seed=s, num_rounds=args.rounds, attempt=args.attempt, force=args.force)
         completed_summaries.append(summary)
-        
+
     if len(completed_summaries) > 0:
         consolidate_multi_seed_results(completed_summaries)
 

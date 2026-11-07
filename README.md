@@ -79,16 +79,17 @@ To enable reproducible execution on resource-constrained hardware without sacrif
 ```
 Input: (B, 3, 28, 28)
   │
-  ├── Conv2D(3 -> 32, kernel=3, padding=1) + BatchNorm2D(32) + ReLU() + MaxPool2D(2, 2)
+  ├── Conv2D(3 -> 32, kernel=3, padding=1) + ReLU() + MaxPool2D(2, 2)
   │     Output: (B, 32, 14, 14)
   │
-  ├── Conv2D(32 -> 64, kernel=3, padding=1) + BatchNorm2D(64) + ReLU() + MaxPool2D(2, 2)
+  ├── Conv2D(32 -> 64, kernel=3, padding=1) + ReLU() + MaxPool2D(2, 2)
   │     Output: (B, 64, 7, 7)
   │
   ├── AdaptiveAvgPool2d((2, 2))
   │     Output: (B, 64, 2, 2) -> Flatten -> (B, 256)
   │
-  ├── Linear(256 -> 64) + ReLU() + Dropout(0.2)
+  ├── Linear(256 -> 64) + ReLU()
+  │     Output: (B, 64)
   │
   └── Linear(64 -> 9)
         Output: Logits (B, 9)
@@ -135,7 +136,7 @@ Strict state-dictionary loading (`load_state_dict(..., strict=True)`) is verifie
 | Learning Rate ($\eta$) | 0.01 | Client-side SGD step size (fixed, momentum=0, weight decay=0) |
 | Proximal Parameter ($\mu$) | 0.01 | FedProx proximal contraction penalty |
 | Loss Function | CrossEntropy | Standard multi-class cross-entropy |
-| Loss Reduction | Sum | Accumulated across batches for sample-weighted metrics |
+| Loss Reduction | Mean (default) | Local client batches compute mean cross-entropy loss via nn.CrossEntropyLoss(), which is multiplied by batch sample count len(y) and accumulated to calculate exact sample-weighted mean epoch loss |
 
 ---
 
@@ -194,14 +195,21 @@ pytest research/tests/ -v
 
 ## 11. Running Experiments
 
+### CLI Arguments & Orchestrator Flags
+The orchestrator `scripts/run_multiseed.py` supports the following explicit command-line flags:
+- `--seeds [INT ...]`: One or more random seeds executed sequentially (default: `42`).
+- `--rounds INT`: Number of communication rounds per algorithm (default: `30`).
+- `--attempt INT`: Unique attempt index to prevent overwriting previous runs (default: `1`). If `attempt > 1`, outputs are written to `experiments/seed_<id>_attempt_<attempt>/`.
+- `--force`: Force overwrite existing experiment directory. Without this flag, the runner aborts if destination directory contains artifacts.
+
 ### Execute Corrected Seed 42 Run (Unbuffered Streaming)
 ```powershell
-python -u scripts/run_multiseed.py --seeds 42 --rounds 30
+python -u scripts/run_multiseed.py --seeds 42 --rounds 30 --attempt 1
 ```
 
 ### Execute Multi-Seed Benchmark (Seeds 42, 123, 2026, 3407, 7777)
 ```powershell
-python -u scripts/run_multiseed.py --seeds 42 123 2026 3407 7777 --rounds 30
+python -u scripts/run_multiseed.py --seeds 42 123 2026 3407 7777 --rounds 30 --attempt 1
 ```
 
 ---
