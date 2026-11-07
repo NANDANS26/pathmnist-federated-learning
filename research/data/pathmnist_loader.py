@@ -176,7 +176,12 @@ def get_test_data(root_dir: str = DATA_DIR):
     Strictly held-out: must only be called ONCE per algorithm after training is completed.
     """
     npz_path = os.path.join(root_dir, "pathmnist.npz")
-    assert os.path.exists(npz_path), f"Expected {npz_path} to exist."
+    if not os.path.exists(npz_path):
+        raise FileNotFoundError(
+            f"PathMNIST archive not found at '{npz_path}'! "
+            f"Please run 'python scripts/initialize_experiment.py' first to acquire "
+            f"and verify the official PathMNIST dataset."
+        )
     with np.load(npz_path) as data:
         images = data["test_images"].copy()
         labels = data["test_labels"].copy()
