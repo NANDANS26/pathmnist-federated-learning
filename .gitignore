@@ -1,23 +1,40 @@
-# Python virtual environment
+# Python virtual environments
 .venv/
-env/
 venv/
+env/
+ENV/
 
-# Bytecode and caches
+# Python bytecode, builds, and caches
 __pycache__/
 *.py[cod]
 *$py.class
 .pytest_cache/
+.mypy_cache/
+.ruff_cache/
+build/
+dist/
+*.egg-info/
 
-# Raw data and memory-mapped files (200+ MB)
+# IDE, OS, and local editor temporary files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+Thumbs.db
+.DS_Store
+
+# Environment variables, credentials, and authentication
+.env
+.env.*
+!.env.example
+wandb/
+
+# Large raw datasets and uncompressed memory-mapped binary arrays (200+ MB)
+# PathMNIST data can be re-acquired via `python scripts/initialize_experiment.py`
 data/
 *.npz
 *.npy
 
-# Binary model checkpoints (keep manifests and configs)
-experiments/checkpoints/
-experiments/legacy_seed42_pre_batch_fix/checkpoints/
-*.pt
-
-# Embedded upstream repository (maintained independently)
+# Upstream reference framework (cloned independently)
 third_party/PFLlib/
