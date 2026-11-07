@@ -163,7 +163,7 @@
         }
       },
       "test_loss": 0.67212,
-      "checkpoint_path": "D:\\NANDAN.S\\ENGINEERING\\GITHUB ISSUES\\pathmnist-federated-learning\\experiments\\checkpoints\\fedavg_alpha0.3_noise40_seed42_best.pt",
+      "checkpoint_path": "experiments\\checkpoints\\fedavg_alpha0.3_noise40_seed42_best.pt",
       "checkpoint_sha256": "bf5f4c44c72b1e913f2f793d741b40ceb094a16ab639a8d4645b470d99ccc2c3",
       "total_test_samples": 7180
     },
@@ -329,14 +329,14 @@
         }
       },
       "test_loss": 0.71425,
-      "checkpoint_path": "D:\\NANDAN.S\\ENGINEERING\\GITHUB ISSUES\\pathmnist-federated-learning\\experiments\\checkpoints\\fedprox_mu0.01_alpha0.3_noise40_seed42_best.pt",
+      "checkpoint_path": "experiments\\checkpoints\\fedprox_mu0.01_alpha0.3_noise40_seed42_best.pt",
       "checkpoint_sha256": "6e5b05eb47ddcfafd817defa81bd6a24c074cbf9f1dce213fb5e5e12a90af375",
       "total_test_samples": 7180
     }
   },
   "raw_jsonl_log_reconstruction": {
     "fedavg": {
-      "file_path": "D:\\NANDAN.S\\ENGINEERING\\GITHUB ISSUES\\pathmnist-federated-learning\\experiments\\logs\\fedavg_metrics.jsonl",
+      "file_path": "experiments\\logs\\fedavg_metrics.jsonl",
       "total_rounds_logged": 30,
       "best_round": 26,
       "best_val_accuracy": 0.73291,
@@ -355,7 +355,7 @@
       }
     },
     "fedprox": {
-      "file_path": "D:\\NANDAN.S\\ENGINEERING\\GITHUB ISSUES\\pathmnist-federated-learning\\experiments\\logs\\fedprox_metrics.jsonl",
+      "file_path": "experiments\\logs\\fedprox_metrics.jsonl",
       "total_rounds_logged": 30,
       "best_round": 30,
       "best_val_accuracy": 0.73361,

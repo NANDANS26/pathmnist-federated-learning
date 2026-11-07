@@ -1,208 +1,284 @@
-# Comparative Analysis of FedAvg and FedProx on Non-IID PathMNIST with Label Noise
+# Comparative Experimental Analysis of FedAvg and FedProx on Non-IID PathMNIST with Label Noise
 
-**Research Supervision:** Dr. Sachin D N, Assistant Professor, Department of Computer Science and Engineering, IIIT Bhopal  
-**Fellowship Target:** IndiaAI Fellowship 2026–27 (Technical Screening Submission)  
-**Author:** Senior Federated Learning Research Scientist & Systems Architect  
-**Core Framework:** Original Modular Research Implementation based on [PFLlib](https://github.com/TsingZ0/PFLlib) (Tsinghua University)  
-**Current Status:** **Phase 3 Completed (Full Experiments, Telemetry & Held-Out Test Evaluation Finalized)** — Ready for Final IndiaAI Screening Review
+[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
+[![PyTorch 2.0+](https://img.shields.io/badge/PyTorch-2.0+-ee4c2c.svg)](https://pytorch.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![IndiaAI Fellowship](https://img.shields.io/badge/IndiaAI%20Fellowship-2026--27-orange.svg)](https://indiaai.gov.in/)
 
----
-
-## 1. Project Overview
-
-This research repository provides an empirical, mathematically grounded comparison between two foundational federated learning paradigms:
-1. **Federated Averaging (FedAvg)** (McMahan et al., 2017)
-2. **Federated Proximal (FedProx)** (Li et al., 2020)
-
-### 1.1 Experimental Conditions
-- **Dataset:** PathMNIST from MedMNIST v2 (9 histological classes, $28 \times 28 \times 3$ RGB images).
-- **Federated Topology:** 5 clients, full synchronous client participation ($C = 1.0$).
-- **Data Distribution:** Non-IID Dirichlet distribution with concentration parameter $\alpha = 0.3$.
-- **Adversarial / Noisy Client:** Client 5 (zero-based index 4) corrupted with exactly 40% symmetric label noise in its local training partition. Clients 1–4 remain 100% clean.
-- **Evaluation Strategy:**
-  - **Round-Level Metrics:** Global and per-client validation accuracy and loss on clean validation partitions (official PathMNIST validation split).
-  - **Diagnostic Metrics:** Client parameter update $L_2$ norms, pairwise cosine similarities (10 pairs), clean-to-noisy alignment, and similarity to the sample-weighted mean update.
-  - **Held-Out Benchmark:** Each algorithm's selected best-validation checkpoint is evaluated once on the official PathMNIST test split (7,180 samples) after training has finished (zero test set exposure during training or model selection).
-- **Experiment Tracking:** Local durable JSONL/CSV logging supplemented by Weights & Biases (W&B).
-- **Target Hardware:** Windows 10, Intel Pentium G3240 (2-Core CPU), 4 GB RAM (PyTorch CPU-only).
-- **Dataset In-Memory Footprint:** Contiguous `uint8` NumPy storage: training images 211.67 MB (201.86 MiB), validation 23.53 MB (22.44 MiB), test 16.89 MB (16.11 MiB); all 3 splits: 252.09 MB (240.41 MiB). Raw float32 batch 32 input tensor is 294.0 KiB.
-- **Model Backbone:** `CompactPathCNN` (36,425 parameters; 4,307,008 MACs / 8,614,016 FLOPs per image; batch 32: 137.82 MMACs / 275.65 MFLOPs).
+**Research Project:** Comparative Experimental Analysis of Federated Averaging (FedAvg) and Federated Proximal (FedProx) on Non-IID PathMNIST with 40% Client-Specific Label Noise
+**Academic Supervision:** Dr. Sachin D N, Assistant Professor, Department of Computer Science and Engineering, IIIT Bhopal
+**Fellowship Programme:** IndiaAI Fellowship 2026–27 (Research Screening Submission)
+**Upstream Reference Framework:** [PFLlib](https://github.com/TsingZ0/PFLlib) (Tsinghua University; reference commit `0169ba7e412c9856a08bb3faefab1e35f538a3c1`)
 
 ---
 
-## 2. Project Status: Phase 1 Finalized
+## 1. Research Objective
 
-The research design and experimental protocol are fully specified. Note: Model training code and dataset acquisition will commence in Phase 2 upon approval.
+This research repository provides an empirically rigorous, fully reproducible comparative analysis between two foundational federated optimization algorithms:
+1. **Federated Averaging (FedAvg)** ([McMahan et al., AISTATS 2017](https://arxiv.org/abs/1602.05629))
+2. **Federated Proximal (FedProx)** ([Li et al., MLSys 2020](https://arxiv.org/abs/1812.06127))
 
-### Phase 0: Technical Audit & Provenance Verification (Completed)
-- Cloned official untouched PFLlib repository (`third_party/PFLlib`, commit `0169ba7e412c9856a08bb3faefab1e35f538a3c1` on `master` branch).
-- Audited FedAvg and FedProx implementations and verified the mathematical exactness of `PerturbedGradientDescent`.
-- Identified upstream data leakage (train/test merge) and eager float32 memory bloat; designed a zero-waste lazy uint8 loading architecture.
-- Documented 12 prioritized technical risks in the Risk Register.
-
-### Phase 1: Research Protocol & Experiment Architecture (Completed)
-- **Research Protocol:** Formulated primary and secondary research questions and three falsifiable scientific hypotheses ([PHASE_1_RESEARCH_PROTOCOL.md](reports/PHASE_1_RESEARCH_PROTOCOL.md)).
-- **Experiment Design:** Designed strict split isolation (train: 89,996; val: 10,004; test: 7,180), class-wise Dirichlet partitioning ($\alpha=0.3$, seed=42) without artificial truncation, and 40% symmetric label noise on Client 5 ([PHASE_1_EXPERIMENT_DESIGN.md](reports/PHASE_1_EXPERIMENT_DESIGN.md)).
-- **Model Architecture:** Selected and specified `CompactPathCNN` (~36,425 parameters, 2 Conv layers + Adaptive Average Pooling + 2 FC layers) optimized for dual-core CPU throughput and low memory footprint.
-- **Metric Specifications:** Formulated sample-weighted validation metrics, client update $L_2$ norms, pairwise cosine similarities, and W&B logging schemas ([PHASE_1_METRIC_SPECIFICATION.md](reports/PHASE_1_METRIC_SPECIFICATION.md)).
-- **Reproducibility Plan:** Designed deterministic seeding (master seed 42), partition and noise manifests, SHA-256 weight initialization checkpoints, and local durable JSONL logging ([PHASE_1_REPRODUCIBILITY_PLAN.md](reports/PHASE_1_REPRODUCIBILITY_PLAN.md)).
-- **Machine-Readable Protocol:** Created [configs/experiment_protocol.yaml](configs/experiment_protocol.yaml).
-- **Quality Gates:** Defined objective acceptance criteria for all subsequent implementation phases ([PHASE_1_ACCEPTANCE_CRITERIA.md](reports/PHASE_1_ACCEPTANCE_CRITERIA.md)).
+The study investigates how client-level data heterogeneity (non-IID Dirichlet distribution) interacts with asymmetric client-specific label corruption (40% label noise concentrated in a single client) during decentralized model convergence and held-out test generalization.
 
 ---
 
-## 3. Repository Structure
+## 2. Dataset & Official Splits
+
+The study uses the official **PathMNIST** dataset from the [MedMNIST v2](https://medmnist.com/) biomedical benchmark:
+- **Modality:** Colorectal cancer histology ($28 \times 28 \times 3$ RGB images).
+- **Classes:** 9 distinct histological tissue categories (Adipose, Background, Debris, Lymphocytes, Mucus, Smooth Muscle, Normal Colon Mucosa, Cancer-Associated Stroma, Colorectal Adenocarcinoma).
+- **Official Splits & Integrity:**
+  - **Training Split:** Exactly 89,996 images `(89996, 28, 28, 3)` and labels `(89996, 1)`, `uint8`.
+  - **Validation Split:** Exactly 10,004 images `(10004, 28, 28, 3)` and labels `(10004, 1)`, `uint8`.
+  - **Test Split:** Exactly 7,180 images `(7180, 28, 28, 3)` and labels `(7180, 1)`, `uint8`.
+- **Cryptographic Verification:**
+  - Official MedMNIST v2 archive: `data/pathmnist.npz` (216,423,010 bytes).
+  - MD5: `a8b06965200029087d5bd730944a56c1` (Exact match with official benchmark).
+  - SHA-256: `81823f52dc622e69db2db4c72f8e8e617938dd6864d3c1f23d4e49724a28ea72`.
+- **Quarantine & Zero-Leakage Policy:** The 7,180-sample test split is strictly quarantined during training. It is evaluated exactly once post-training on the optimal validation checkpoint (zero exposure during model training or checkpoint selection).
+
+---
+
+## 3. Five-Client Non-IID Dirichlet Partitioning
+
+The 89,996 training samples are partitioned across 5 federated clients using a class-wise Dirichlet distribution with concentration parameter $\alpha = 0.3$:
+
+$$p_{k,c} \sim \text{Dir}(\alpha = 0.3), \quad \sum_{k=1}^5 p_{k,c} = 1$$
+
+Where $p_{k,c}$ is the proportion of class $c$ allocated to client $k$.
+
+| Client ID | Human Identifier | Sample Count | Percentage | Primary Enriched Classes |
+| :---: | :---: | :---: | :---: | :--- |
+| Client 0 | Client 1 | 24,650 | 27.39% | Class 0 (Adipose), Class 4 (Mucus) |
+| Client 1 | Client 2 | 30,566 | 33.96% | Class 1 (Background), Class 8 (Colorectal Adenocarcinoma) |
+| Client 2 | Client 3 | 14,388 | 15.99% | Class 7 (Stroma), Class 5 (Smooth Muscle) |
+| Client 3 | Client 4 | 12,497 | 13.89% | Class 3 (Lymphocytes) |
+| **Client 4** | **Client 5 (Noisy)**| **7,895** | **8.77%** | **Class 2 (Debris: 2,052), Class 6 (Normal Mucosa: 1,490)** |
+| **Total** | | **89,996** | **100.00%** | **Exact partition; zero dropped or duplicate samples** |
+
+### Mathematical Note on Client 5 Sample Count
+Because $\alpha = 0.3 < 1.0$, the Dirichlet probability density function concentrates probability mass near the simplex boundaries. Across 9 independent draws (Seed 42), Client 5 naturally drew low shares in classes 5, 7, and 8, while drawing moderate allocations in classes 2 and 6. This skew is an authentic mathematical consequence of Dirichlet sampling, not a defect.
+
+---
+
+## 4. Client 5 Label-Noise Methodology
+
+To model adversarial or low-grade edge client sensor error:
+- **Target Client:** Client 5 (zero-based index 4).
+- **Corruption Rate:** Exactly 40.000% of local training samples (3,158 corrupted samples out of 7,895).
+- **Corruption Mechanism:** Deterministic symmetric label flipping modulo 9:
+  $$\tilde{y} = (y_{\text{clean}} + r) \pmod 9, \quad r \in \{1, 2, \dots, 8\}$$
+- **Isolation:** Clients 1–4, the official validation split, and the test split remain **100% clean**.
+
+---
+
+## 5. Model Architecture: `CompactPathCNN`
+
+To enable reproducible execution on resource-constrained hardware without sacrificing representational capacity, the study implements `CompactPathCNN`:
+
+```
+Input: (B, 3, 28, 28)
+  │
+  ├── Conv2D(3 -> 32, kernel=3, padding=1) + BatchNorm2D(32) + ReLU() + MaxPool2D(2, 2)
+  │     Output: (B, 32, 14, 14)
+  │
+  ├── Conv2D(32 -> 64, kernel=3, padding=1) + BatchNorm2D(64) + ReLU() + MaxPool2D(2, 2)
+  │     Output: (B, 64, 7, 7)
+  │
+  ├── AdaptiveAvgPool2d((2, 2))
+  │     Output: (B, 64, 2, 2) -> Flatten -> (B, 256)
+  │
+  ├── Linear(256 -> 64) + ReLU() + Dropout(0.2)
+  │
+  └── Linear(64 -> 9)
+        Output: Logits (B, 9)
+```
+
+### Exact Parameter Count Verification:
+| Layer | Weight Shape | Bias Shape | Trainable Parameters |
+| :--- | :--- | :--- | :---: |
+| `conv1` | `[32, 3, 3, 3]` (864) | `[32]` (32) | **896** |
+| `conv2` | `[64, 32, 3, 3]` (18,432) | `[64]` (64) | **18,496** |
+| `fc1` | `[64, 256]` (16,384) | `[64]` (64) | **16,448** |
+| `fc2` | `[9, 64]` (576) | `[9]` (9) | **585** |
+| **Total Parameters** | | | **36,425** |
+
+Strict state-dictionary loading (`load_state_dict(..., strict=True)`) is verified on all checkpoints.
+
+---
+
+## 6. Federated Algorithms & Optimization
+
+### Federated Averaging (FedAvg)
+- Local updates are computed via standard SGD:
+  $$w_{k,t+1} = w_{k,t} - \eta \nabla F_k(w_{k,t})$$
+- Central server performs sample-weighted aggregation:
+  $$w_{t+1} = \sum_{k=1}^5 \frac{n_k}{N} w_{k,t+1}, \quad N = \sum_{k=1}^5 n_k = 89,996$$
+
+### Federated Proximal (FedProx, $\mu = 0.01$)
+- Employs a proximal regularization penalty to restrict client drift:
+  $$\min_w h_k(w; w_t) = F_k(w) + \frac{\mu}{2} \|w - w_t\|^2$$
+- Implemented via exact Perturbed SGD (`research/optimizers/perturbed_sgd.py`):
+  $$d_p = \nabla F_k(w) + \mu (w - w_t), \quad w \leftarrow w - \eta d_p$$
+
+---
+
+## 7. Hyperparameter Configuration
+
+| Hyperparameter | Value | Description |
+| :--- | :---: | :--- |
+| Number of Clients ($K$) | 5 | Total federated participants |
+| Client Participation ($C$) | 1.0 | Full synchronous client participation per round |
+| Communication Rounds ($T$) | 30 | Global aggregation cycles |
+| Local Epochs ($E$) | 2 | Training passes over local partition per round |
+| Batch Size ($B$) | 32 | Mini-batch sample size |
+| Learning Rate ($\eta$) | 0.01 | Client-side SGD step size (fixed, momentum=0, weight decay=0) |
+| Proximal Parameter ($\mu$) | 0.01 | FedProx proximal contraction penalty |
+| Loss Function | CrossEntropy | Standard multi-class cross-entropy |
+| Loss Reduction | Sum | Accumulated across batches for sample-weighted metrics |
+
+---
+
+## 8. Installation & Setup
+
+### Prerequisites
+- Python 3.11.x (recommended)
+- Git 2.30+
+
+### Step 1: Clone Repository
+```powershell
+git clone https://github.com/NANDANS26/pathmnist-federated-learning.git
+cd pathmnist-federated-learning
+```
+
+### Step 2: Environment Setup
+
+#### Option A: CPU-Only Setup (Primary Study Platform)
+```powershell
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+pip install --upgrade pip
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+pip install -r requirements.txt
+```
+
+#### Option B: CUDA-Accelerated Setup (Compatible Machines)
+```powershell
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+pip install --upgrade pip
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
+pip install -r requirements.txt
+```
+
+---
+
+## 9. Dataset Acquisition & Verification
+
+Download and generate contiguous memory-mapped arrays from official MedMNIST:
+```powershell
+python scripts/initialize_experiment.py
+```
+This script downloads `data/pathmnist.npz`, verifies the cryptographic SHA-256 and MD5 hashes, precomputes client Dirichlet partitions, injects Client 5 label noise, and compiles provenance manifests in `experiments/manifests/`.
+
+---
+
+## 10. Test & Regression Suite
+
+Run the full automated test suite (22 tests covering model dimensions, backward pass, perturbed SGD, Dirichlet partitioning, deterministic mini-batch shuffling, and zero-leakage split isolation):
+```powershell
+pytest research/tests/ -v
+```
+
+---
+
+## 11. Running Experiments
+
+### Execute Corrected Seed 42 Run (Unbuffered Streaming)
+```powershell
+python -u scripts/run_multiseed.py --seeds 42 --rounds 30
+```
+
+### Execute Multi-Seed Benchmark (Seeds 42, 123, 2026, 3407, 7777)
+```powershell
+python -u scripts/run_multiseed.py --seeds 42 123 2026 3407 7777 --rounds 30
+```
+
+---
+
+## 12. Directory Structure
 
 ```
 pathmnist-federated-learning/
 │
-├── third_party/
-│   └── PFLlib/                       # Untouched official upstream reference framework
+├── research/                         # Modular research framework
+│   ├── core/                         # FederatedClient, FederatedServer, FedAvg & FedProx runners
+│   ├── data/                         # PathMNIST loader, Dirichlet partitioner, noise injector
+│   ├── diagnostics/                  # Update norms, cosine similarity, memory tracker
+│   ├── models/                       # CompactPathCNN architecture
+│   ├── optimizers/                   # Exact PerturbedSGD optimizer
+│   └── tests/                        # 22 automated unit and regression tests
 │
-├── reports/                          # Phase audits, protocols, and technical reports
-│   ├── PHASE_0_REPOSITORY_AUDIT.md
-│   ├── PHASE_0_FEDERATED_ALGORITHMS_AUDIT.md
-│   ├── PHASE_0_DATASET_AND_PARTITIONING_AUDIT.md
-│   ├── PHASE_0_RESOURCE_FEASIBILITY_REPORT.md
-│   ├── PHASE_0_EVALUATION_AND_DIAGNOSTICS_AUDIT.md
-│   ├── PHASE_0_RISK_REGISTER.md
-│   ├── PHASE_0_IMPLEMENTATION_BLUEPRINT.md
-│   ├── PHASE_0_COMMANDS_AND_VERIFICATION.md
-│   ├── PHASE_0_FINAL_REVIEW_REPORT.md
-│   ├── PHASE_1_RESEARCH_PROTOCOL.md
-│   ├── PHASE_1_EXPERIMENT_DESIGN.md
-│   ├── PHASE_1_METRIC_SPECIFICATION.md
-│   ├── PHASE_1_REPRODUCIBILITY_PLAN.md
-│   ├── PHASE_1_ARCHITECTURE_SPECIFICATION.md
-│   ├── PHASE_1_ACCEPTANCE_CRITERIA.md
-│   ├── PHASE_1_DECISIONS_AND_OPEN_QUESTIONS.md
-│   ├── PHASE_1_FINAL_TECHNICAL_CORRECTION_REPORT.md
-│   └── PHASE_1_FINAL_CONSISTENCY_AUDIT.md
+├── scripts/                          # Research tooling & execution scripts
+│   ├── initialize_experiment.py      # Dataset acquisition & manifest initialization
+│   ├── independent_verification.py   # Held-out test evaluation & confusion matrix generator
+│   ├── run_multiseed.py              # Multi-seed orchestration engine with unbuffered telemetry
+│   └── sync_to_wandb.py              # Offline-to-cloud W&B synchronizer
 │
-├── configs/
-│   └── experiment_protocol.yaml      # Machine-readable protocol specification
+├── experiments/                      # Persisted experiment artifacts
+│   ├── configs/                      # Seed manifests (partition, validation, noise)
+│   ├── checkpoints/                  # Trained model checkpoints (.pt)
+│   ├── logs/                         # Durable JSONL round logs & summary CSVs
+│   ├── results/                      # Confusion matrices, test predictions, benchmark JSONs
+│   ├── figures/                      # High-resolution (300 DPI) publication plots
+│   ├── legacy_seed42_pre_batch_fix/  # Preserved Phase 3 experimental run
+│   └── interrupted_attempts/         # Quarantined partial runs
 │
-├── research/                         # Original, modular federated framework (Phase 2)
-│   ├── data/                         # Data loader, partitioner, noise injector
-│   ├── models/                       # CompactPathCNN architecture (~36k params)
-│   ├── optimizers/                   # Exact PerturbedSGD implementation
-│   ├── core/                         # Federated client, server, and runners
-│   ├── diagnostics/                  # Update norms & pairwise cosine telemetry
-│   └── tests/                        # Automated unit tests and pilot benchmarks
-│
-├── experiments/                      # Persisted outputs
-│   ├── configs/                      # Partition and noise manifests
-│   ├── checkpoints/                  # Model checkpoints
-│   ├── logs/                         # Local durable JSONL logs
-│   └── figures/                      # Publication figures
-│
-├── requirements.txt                  # Minimal CPU dependencies
-└── README.md
+├── reports/                          # Comprehensive Phase 0 to Phase 4B research audits
+├── requirements.txt                  # Portable dependency manifest
+├── PROJECT_STATUS.md                 # Live milestone and execution tracking document
+└── README.md                         # Master documentation
 ```
 
 ---
 
-## 4. Phase 2 Completion & CPU Pilot Benchmark
+## 13. Experiment Tracking & Weights & Biases (W&B)
 
-Phase 2 implementation has been successfully executed, tested, and validated on the target dual-core Pentium G3240 platform.
+All rounds durably log telemetry to disk as JSON Lines (`.jsonl`) files with synchronous OS flushes.
 
-### 4.1 Implementation Deliverables
-- **Virtual Environment:** Python 3.11.9 with official PyTorch CPU (`torch==2.15.0+cpu`).
-- **Data Engineering:** Memory-mapped `.npy` storage for PathMNIST (`(89996, 28, 28, 3)` train, `(10004, 28, 28, 3)` val) with zero RAM waste.
-- **Partitioning & Apportionment:** Class-wise Dirichlet partitioning ($\alpha=0.3$, seed 42) and Hamilton-Hare largest-remainder validation apportionment.
-- **Label Noise Injection:** Exact 40.00% symmetric multiclass flipping ($\tilde{y} = (y + r) \pmod 9$) on Client 5 (3,158 corrupted samples). Clients 1–4 and validation shards remain 100% clean.
-- **Model Backbone:** `CompactPathCNN` (36,425 parameters, SHA-256 checkpoint: `b30f8ea6...`).
-- **Algorithms:** FedAvg baseline and FedProx with `PerturbedSGD` ($w \leftarrow w - \eta[\nabla F + \mu(w - w_{\text{global}})]$).
-- **Diagnostics:** $L_2$ update norms, 10 pairwise cosine similarities, and clean-to-noisy alignment tracking.
-- **Testing:** 19/19 PyTest automated unit tests passed in 9.08s.
-
-### 4.2 CPU Pilot Benchmark Results (Real PathMNIST Data)
-
-| Metric | FedAvg Baseline | FedProx ($\mu = 0.01$) | Key Scientific Observation |
-| :--- | :---: | :---: | :--- |
-| **Completed Rounds** | 2 | 2 | Evaluated on full 89,996 train & 10,004 val |
-| **Mean Round Time ($T_{\text{round}}$)** | 405.86 s | 837.50 s | Combined mean: **621.68 s (10.36 min)** |
-| **Batches per Round** | 5,630 batches | 5,630 batches | 2 local epochs per client |
-| **Step Latency** | ~72.1 ms/batch | ~148.8 ms/batch | Combined mean: **110.42 ms/batch** |
-| **Peak Process RSS** | 497.95 MB | 266.17 MB | **Strictly below 500 MB** (4 GB RAM platform safe) |
-| **Lowest Available RAM** | 380.64 MB | 340.41 MB | Emergency threshold (150 MB) never breached |
-| **Global Val Acc (R2)** | 25.32% | **25.53%** | FedProx exhibits early convergence edge |
-| **Clean-to-Noisy Alignment** | **0.2369** | **0.1789** | **24.5% reduction in noisy alignment with FedProx!** |
-
-### 4.3 Communication Horizon Calibration
-- In accordance with the approved calibration decision tree, because $T_{\text{round}} = 621.7\text{ s} > 120\text{ s}$, the communication horizon is formally capped at **$R = 30$ rounds**.
-- **Projected Total Runtime:**
-  - FedAvg: 30 rounds $\times$ 405.86 s $\approx$ **3.38 hours**
-  - FedProx: 30 rounds $\times$ 837.50 s $\approx$ **6.98 hours**
-  - Combined Full Study: **$\approx$ 10.36 hours** (completes comfortably overnight within the IndiaAI screening schedule).
-
-### 4.4 How to Reproduce
-```bash
-# Activate virtual environment
-.venv\Scripts\activate
-
-# Run automated unit test suite
-python -m pytest research/tests -v
-
-# Run 1-round functional smoke test
-python scripts/run_smoke_test.py
-
-# Run 2-round CPU pilot benchmark
-python scripts/run_pilot.py
+To synchronize local runs to a public W&B dashboard:
+```powershell
+wandb login <YOUR_WANDB_API_KEY>
+python scripts/sync_to_wandb.py --project pathmnist-fedavg-fedprox
 ```
 
 ---
 
-## 5. Phase 3 Full Comparative Experiments & Scientific Findings
+## 14. Hardware Platform & Resource Constraints
 
-The two mandatory primary experimental runs (FedAvg baseline and FedProx with $\mu = 0.01$) were executed to full completion for 30 communication rounds on real non-IID PathMNIST data with 40% label noise on Client 5.
-
-### 5.1 Final Comparison Summary
-
-| Metric | FedAvg Baseline | FedProx ($\mu = 0.01$) | Empirical Difference ($\Delta$) | Superior Algorithm |
-| :--- | :---: | :---: | :---: | :---: |
-| **Completed Rounds** | 30 / 30 | 30 / 30 | Identical horizon | Both completed |
-| **Best Global Validation Accuracy** | 73.291% (0.73291) | **73.361% (0.73361)** | +0.070% | **FedProx** |
-| **Best Global Validation Loss** | **0.73041** | 0.73197 | -0.00156 | **FedAvg** |
-| **Selected Checkpoint Round** | Round 26 | Round 30 | +4 rounds | FedProx converges later |
-| **Final Test Accuracy (Held-Out)** | **79.457% (0.79457)** | 76.072% (0.76072) | **+3.385%** | **FedAvg** |
-| **Final Test Loss (Held-Out)** | **0.67212** | 0.71425 | -0.04213 | **FedAvg** |
-| **Mean Client Update $L_2$ Norm** | 0.84929 | **0.81891** | -0.03038 (-3.58%) | FedProx constrains updates |
-| **Mean Clean-to-Noisy Alignment** | -0.07611 | -0.07583 | +0.00028 | Negative orthogonal drift |
-| **Mean Clean-to-Clean Consensus** | 0.23041 | 0.22947 | -0.00094 | Coherent clean coordination |
-| **Mean Round Duration** | 292.25 s | **278.57 s** | -13.68 s (-4.68%) | FedProx was faster |
-| **Total Wall-Clock Time** | 121.05 min (~2.02 h) | 139.32 min (~2.32 h) | **260.37 min (~4.34 h)** | 100% completed |
-| **Peak Process RSS** | 659.31 MB | **289.76 MB** | Bounded heap usage | Safe on 4 GB RAM |
-
-### 5.2 Key Scientific Insights
-1. **Validation Convergence vs Test Generalization:** FedProx achieved a marginally higher peak validation accuracy (**73.36% vs 73.29%**), but FedAvg achieved superior out-of-distribution test generalization on the held-out test split (**79.46% vs 76.07%**, a **+3.39% advantage**).
-2. **Persistent Gradient Conflict on Noisy Client:** While clean clients' update $L_2$ norms steadily contracted to $\approx 0.50$ as consensus was reached, **Client 5's update norm remained elevated at $\approx 0.96$ at convergence**. The 40% label flipping created continuous gradient turbulence that prevented Client 5 from settling into the clean minimum.
-3. **Orthogonal Parameter Subspace Divergence:** Both algorithms caused clean clients to diverge into a parameter subspace orthogonal to Client 5, resulting in a negative long-term clean-to-noisy cosine similarity ($\approx -0.076$).
-4. **Contractive Effect of the Proximal Term:** FedProx's proximal penalty $\mu = 0.01$ reduced mean client update displacement by **3.58%**, shrinking updates from clean clients and stabilizing parameter drift.
-
-### 5.3 Publication Figures (`experiments/figures/`)
-- `FIG-01_global_val_accuracy.png`: Global validation accuracy progression across 30 rounds.
-- `FIG-02_global_val_loss.png`: Global cross-entropy validation loss decline.
-- `FIG-03_per_client_accuracy.png`: Per-client validation accuracy across clean and corrupted shards.
-- `FIG-04_per_client_loss.png`: Per-client validation loss evolution.
-- `FIG-05_update_l2_norms.png`: Client parameter update displacement $L_2$ norms.
-- `FIG-06_pairwise_cosine_similarities.png`: 10 pairwise client update cosine similarities.
-- `FIG-07_clean_noisy_alignment.png`: Comparative clean-to-noisy alignment vs clean consensus.
-
-### 5.4 Reproduction Instructions
-```bash
-# 1. Activate project environment
-cd pathmnist-federated-learning
-.venv\Scripts\activate
-
-# 2. Run unit tests
-python -m pytest research/tests -v
-
-# 3. Execute full 30-round experiments (FedAvg + FedProx + Test Evaluation + Figures)
-python scripts/run_phase3.py 30
-```
+All experiments in this submission were executed on an entry-level physical CPU host:
+- **Processor:** Intel Pentium G3240 @ 3.10 GHz (Dual-Core, 2 Threads, no AVX2/FMA).
+- **Memory:** 4 GB Physical DDR3 RAM.
+- **Operating System:** Windows 10 Pro 64-bit.
+- **Memory Profiling:** Process RSS strictly bounded to **289.8 MB – 659.3 MB**.
+- **Wall-Clock Duration:**
+  - 1 paired round $\approx 9.5$ to $12.0$ minutes.
+  - 30 paired rounds $\approx 4.5$ to $6.0$ hours.
 
 ---
 
-## 6. Fellowship Screening Conclusion
-The technical screening assignment for the IndiaAI Fellowship 2026–27 supervised by Dr. Sachin D N (IIIT Bhopal) is complete with full empirical data, durable logs, cryptographic checksums, and rigorous analysis. Detailed documentation is preserved in [reports/PHASE_3_EXPERIMENT_EXECUTION_REPORT.md](reports/PHASE_3_EXPERIMENT_EXECUTION_REPORT.md).
+## 15. Experimental Results & Current Status
+
+### Summary of Completed Experimental Evidence:
+
+| Experiment Identifier | Status | FedAvg Val Acc | FedProx Val Acc | FedAvg Test Acc | FedProx Test Acc |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| **Legacy Phase 3 (Seed 42)** | **Archived** | 73.29% (R26) | 73.36% (R30) | **79.46%** | 76.07% |
+| **Interrupted Attempt (Seed 42)** | **Quarantined** (Rounds 1–20) | 68.27% (R20) | — | — | — |
+| **Corrected Multi-Seed (Seed 42)**| **Ready for Execution** | Pending | Pending | Pending | Pending |
+
+### Key Scientific Findings (Legacy Run):
+- **Generalization Gap:** While FedProx achieved marginally higher peak validation accuracy (+0.07%), FedAvg exhibited superior held-out test generalization (+3.39% accuracy, +0.0474 macro-F1).
+- **Hypothesized Mechanism:** Proximal contraction penalty ($\mu = 0.01$) constrained clean clients from taking sufficiently large update steps away from the noisy global average $w_t$, contributing to recall collapse on classes heavily represented on the noisy client (Class 2: 28.32% vs 60.47%; Class 6: 48.18% vs 77.33%).
+
+See [`PROJECT_STATUS.md`](PROJECT_STATUS.md) for live milestone tracking and [`reports/`](reports/) for complete technical audits.

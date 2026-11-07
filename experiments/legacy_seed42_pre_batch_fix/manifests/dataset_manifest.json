@@ -2,7 +2,7 @@
   "dataset_name": "PathMNIST",
   "benchmark_suite": "MedMNIST v2",
   "official_url": "https://zenodo.org/records/10519652/files/pathmnist.npz?download=1",
-  "npz_path": "D:\\NANDAN.S\\ENGINEERING\\GITHUB ISSUES\\pathmnist-federated-learning\\data\\pathmnist.npz",
+  "npz_path": "data/pathmnist.npz",
   "npz_file_size_bytes": 205615438,
   "npz_md5": "a8b06965200029087d5bd730944a56c1",
   "npz_sha256": "81823f52dc622e69db2db4c72f8e8e617938dd6864d3c1f23d4e49724a28ea72",
@@ -38,8 +38,8 @@
         1
       ],
       "label_dtype": "uint8",
-      "mmap_image_file": "D:\\NANDAN.S\\ENGINEERING\\GITHUB ISSUES\\pathmnist-federated-learning\\data\\pathmnist_mmap\\train_images.npy",
-      "label_file": "D:\\NANDAN.S\\ENGINEERING\\GITHUB ISSUES\\pathmnist-federated-learning\\data\\pathmnist_mmap\\train_labels.npy"
+      "mmap_image_file": "data/pathmnist_mmap/train_images.npy",
+      "label_file": "data/pathmnist_mmap/train_labels.npy"
     },
     "val": {
       "sample_count": 10004,
@@ -55,8 +55,8 @@
         1
       ],
       "label_dtype": "uint8",
-      "mmap_image_file": "D:\\NANDAN.S\\ENGINEERING\\GITHUB ISSUES\\pathmnist-federated-learning\\data\\pathmnist_mmap\\val_images.npy",
-      "label_file": "D:\\NANDAN.S\\ENGINEERING\\GITHUB ISSUES\\pathmnist-federated-learning\\data\\pathmnist_mmap\\val_labels.npy"
+      "mmap_image_file": "data/pathmnist_mmap/val_images.npy",
+      "label_file": "data/pathmnist_mmap/val_labels.npy"
     },
     "test": {
       "sample_count": 7180,

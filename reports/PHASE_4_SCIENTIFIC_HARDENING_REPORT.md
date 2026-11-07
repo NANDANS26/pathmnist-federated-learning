@@ -1,13 +1,20 @@
 # PHASE 4 SCIENTIFIC HARDENING & ADVERSARIAL VALIDATION REPORT
 # Comprehensive Forensic Verification, Discrepancy Resolution & Independent Metric Reconstruction
+*(Legacy Experiment Archive: Pre-Batch-Fix Seed 42 Run)*
 
-**Project:** Comparative Experimental Analysis of Federated Averaging (FedAvg) and Federated Proximal (FedProx) on Non-IID PathMNIST with 40% Client-Specific Label Noise  
-**Programme:** IndiaAI Fellowship 2026–27 (Research Screening Submission)  
-**Research Mentor:** Dr. Sachin D N, Assistant Professor, Department of Computer Science and Engineering, IIIT Bhopal  
-**Hardware Environment:** Windows 10 Pro (64-bit), Intel Pentium G3240 @ 3.10 GHz (Dual-Core, 2 Threads), 4 GB Physical RAM, PyTorch CPU-Only  
-**Git Commit Hash:** `b08a76525b93f5baa358275d15bf4a040e49f1d1`  
-**Execution Date:** 2026-11-07  
-**Status:** PHASE 4 COMPLETE — ADVERSARIALLY AUDITED, DISCREPANCIES RESOLVED, HELD-OUT PREDICTIONS ARCHIVED  
+> [!WARNING]
+> **Legacy Status & Open Hypotheses:**
+> This report documents the forensic evaluation of the original Phase 3 experimental run (archived in `experiments/legacy_seed42_pre_batch_fix/`).
+> 1. **Timing Reconciliation:** The timing reconciliation between round-level duration sums and process-level wall-clock time remains provisional for this legacy run, awaiting exact timestamp reconciliation from the Phase 4B unbuffered orchestrator.
+> 2. **Causal Hypotheses:** Observations regarding FedProx recall degradation on Classes 2 and 6 are formulated as **working hypotheses** regarding proximal contraction dynamics under asymmetric noise rather than proven causal certainties, pending controlled ablation studies.
+
+**Project:** Comparative Experimental Analysis of Federated Averaging (FedAvg) and Federated Proximal (FedProx) on Non-IID PathMNIST with 40% Client-Specific Label Noise
+**Programme:** IndiaAI Fellowship 2026–27 (Research Screening Submission)
+**Research Mentor:** Dr. Sachin D N, Assistant Professor, Department of Computer Science and Engineering, IIIT Bhopal
+**Hardware Environment:** Windows 10 Pro (64-bit), Intel Pentium G3240 @ 3.10 GHz (Dual-Core, 2 Threads), 4 GB Physical RAM, PyTorch CPU-Only
+**Git Commit Hash:** `b08a76525b93f5baa358275d15bf4a040e49f1d1`
+**Execution Date:** 2026-11-07
+**Status:** PHASE 4 COMPLETE — ADVERSARIALLY AUDITED, DISCREPANCIES RESOLVED, HELD-OUT PREDICTIONS ARCHIVED
 
 ---
 
@@ -27,8 +34,8 @@ Every split of the official PathMNIST dataset was independently audited from raw
 
 ### 1.2 Partitioning & Client 5 Size Investigation
 - **Client Training Allocations:** Client 1 = 24,650; Client 2 = 30,566; Client 3 = 14,388; Client 4 = 12,497; Client 5 = 7,895. Sum = exactly 89,996 samples (zero unassigned, zero duplicates).
-- **Client 5 Partition Size Investigation:**  
-  *Audit Question:* Why is Client 5 substantially smaller (7,895 samples, 8.77%) than Client 2 (30,566 samples, 33.96%)?  
+- **Client 5 Partition Size Investigation:**
+  *Audit Question:* Why is Client 5 substantially smaller (7,895 samples, 8.77%) than Client 2 (30,566 samples, 33.96%)?
   *Mathematical Finding:* In class-wise Dirichlet partitioning with $\alpha = 0.3 < 1.0$, the probability density function $f(p_1, \dots, p_5) \propto \prod_{i=1}^5 p_i^{-0.7}$ places massive density near the vertices and faces of the 4-simplex. Across 9 independent class draws with seed 42, Client 5 drew low proportions in classes 5 (22 samples), 7 (90 samples), and 8 (1 sample), while drawing moderate shares in class 2 (2,052 samples) and class 3 (2,739 samples). This unequal sample quantity combined with extreme class skew is a **legitimate, mathematically sound property of non-IID Dirichlet sampling ($\alpha = 0.3$)**, NOT an implementation defect.
 - **Client 5 Label Noise Verification:**
   - Total training samples: 7,895.
@@ -94,15 +101,15 @@ An independent verification script (`scripts/independent_verification.py`) re-ev
 | **8** | Colorectal Adenocarcinoma | 1,233 | 0.8445 | 0.8500 | 0.8472 | **0.8572** | **0.9497** | **0.9011** |
 | **Macro**| **Unweighted Mean** | **7,180** | **0.7460** | **0.7418** | **0.7378** | 0.7140 | 0.6866 | 0.6905 |
 
-### 3.3 Root-Cause Analysis of the Generalization Gap
+### 3.3 Working Hypotheses on the Generalization Gap
 Why did FedAvg outperform FedProx on held-out test data (+3.39% accuracy, +0.0474 macro-F1), despite FedProx reaching a marginally higher validation accuracy (+0.07%)?
 
-1. **Class 2 and Class 6 Collapse under Proximal Regularization:**  
+1. **Observed Class-Level Performance Disparity:**
    In Class 2, FedAvg achieved **60.47% recall (F1: 0.528)** whereas FedProx achieved only **28.32% recall (F1: 0.311)**. In Class 6, FedAvg achieved **77.33% recall (F1: 0.738)** whereas FedProx achieved only **48.18% recall (F1: 0.570)**.
-2. **The Mechanism:**  
+2. **Correlation with Noise Concentration:**
    In our Dirichlet non-IID partition ($\alpha = 0.3$), the noisy Client 5 was heavily enriched in Class 2 (2,052 samples) and Class 6 (1,490 samples). Because 40% of Client 5's labels were flipped, Client 5 contributed corrupted gradient signals predominantly on Class 2 and Class 6.
-3. **Proximal Penalty Drawback:**  
-   In FedProx, the proximal penalty $\frac{\mu}{2} \|w - w_{\text{global}}\|^2$ penalized clean clients whenever their local models drifted from the global model. However, to learn the correct representations for Class 2 and Class 6 in the presence of Client 5's noise, clean clients **needed** to take larger, unconstrained update steps away from the noisy global average. FedProx's proximal contraction restricted clean clients from overriding the corrupting influence of Client 5 on those specific classes, causing a marked degradation in test generalization.
+3. **Hypothesized Proximal Contraction Penalty Dynamics:**
+   A potential mechanism under investigation is that FedProx's proximal regularization penalty $\frac{\mu}{2} \|w - w_{\text{global}}\|^2$ penalized clean clients whenever their local models drifted from the global model. If the global average absorbed corrupted representations from Client 5 for Classes 2 and 6, clean clients in FedProx may have been constrained from taking sufficiently large update steps away from that corrupted anchor. In contrast, FedAvg allowed clean clients to update freely. While this represents a plausible explanatory hypothesis, formal causal confirmation would require an explicit clean-label control ablation.
 
 ---
 
@@ -143,9 +150,9 @@ To ensure full reproducibility without contaminating seed 42's verified artifact
 
 All claims, metrics, and conclusions in this submission are grounded in reproducible code, verified checkpoints, and cryptographic checksums:
 
-1. **Defects Found & Corrected:** 
+1. **Defects Found & Corrected:**
    - Reconciled the outdated architectural table in Phase 2 documentation with the actual 36,425-parameter code.
    - Verified that the small Client 5 partition (7,895 samples) is a legitimate mathematical consequence of $\text{Dirichlet}(\alpha=0.3)$.
    - Added an independent evaluation script generating confusion matrices, macro-F1, balanced accuracy, and per-sample predictions.
-2. **Defensible Scientific Finding:**  
+2. **Defensible Scientific Finding:**
    Under non-IID class skew ($\alpha=0.3$) and 40% label noise on Client 5, **FedProx provides a marginal validation gain (+0.07%) but suffers a notable generalization penalty on held-out test data (-3.39% accuracy, -0.0474 macro-F1)** because its proximal penalty inhibits clean clients from overcoming the corrupting influence of noisy clients on classes where the noisy client is heavily enriched.
