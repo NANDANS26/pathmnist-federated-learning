@@ -48,7 +48,7 @@ def get_git_commit_hash() -> str:
         return "c6159b0_untracked"
 
 
-def execute_seed_experiment(seed: int, num_rounds: int = 30) -> dict:
+def execute_seed_experiment(seed: int, num_rounds: int = 30, resume: bool = False) -> dict:
     """
     Executes a complete paired FedAvg and FedProx experiment for a specific seed.
     Guarantees isolated directory storage, immutable metadata, zero checkpoint reuse,
@@ -59,7 +59,7 @@ def execute_seed_experiment(seed: int, num_rounds: int = 30) -> dict:
     git_hash = get_git_commit_hash()
     
     print(f"\n{'='*75}")
-    print(f"   EXECUTING IMMUTABLE PAIRED EXPERIMENT: SEED {seed} ({num_rounds} ROUNDS)   ")
+    print(f"   EXECUTING IMMUTABLE PAIRED EXPERIMENT: SEED {seed} ({num_rounds} ROUNDS, RESUME={resume})   ")
     print(f"   Git Commit: {git_hash} | Start UTC: {iso_start_time}")
     print(f"{'='*75}")
     
@@ -127,13 +127,14 @@ def execute_seed_experiment(seed: int, num_rounds: int = 30) -> dict:
     print(f"Data partitioning & setup complete ({data_prep_overhead_sec}s). Partition SHA: {partition_manifest_sha256[:12]}...")
     
     # 3. Canonical Shared Initial Model Checkpoint
-    torch.manual_seed(seed)
-    init_model = CompactPathCNN(in_channels=3, num_classes=9)
-    init_hash = compute_canonical_model_hash(init_model)
     init_ckpt_path = os.path.join(ckpt_dir, "initial_model.pt")
-    torch.save(init_model.state_dict(), init_ckpt_path)
+    if not (resume and os.path.exists(init_ckpt_path)):
+        torch.manual_seed(seed)
+        init_model = CompactPathCNN(in_channels=3, num_classes=9)
+        init_hash = compute_canonical_model_hash(init_model)
+        torch.save(init_model.state_dict(), init_ckpt_path)
     init_model_sha256 = compute_file_sha256(init_ckpt_path)
-    print(f"Initial model instantiated: SHA-256 = {init_model_sha256}")
+    print(f"Initial model instantiated/loaded: SHA-256 = {init_model_sha256}")
     
     # 4. Primary Run 1: FedAvg
     fedavg_run_name = f"fedavg_alpha0.3_noise40_seed{seed}"
@@ -158,7 +159,7 @@ def execute_seed_experiment(seed: int, num_rounds: int = 30) -> dict:
         run_name=fedavg_run_name,
         checkpoint_dir=ckpt_dir,
         log_dir=log_dir,
-        resume=False,
+        resume=resume,
         seed=seed
     )
     dur_avg_sec = float(round(time.perf_counter() - t0_avg, 3))
@@ -188,7 +189,7 @@ def execute_seed_experiment(seed: int, num_rounds: int = 30) -> dict:
         run_name=fedprox_run_name,
         checkpoint_dir=ckpt_dir,
         log_dir=log_dir,
-        resume=False,
+        resume=resume,
         seed=seed
     )
     dur_prox_sec = float(round(time.perf_counter() - t0_prox, 3))
@@ -429,13 +430,14 @@ def main():
     parser = argparse.ArgumentParser(description="Multi-Seed FL Orchestrator")
     parser.add_argument("--seeds", type=int, nargs="+", default=[42], help="List of seeds to execute")
     parser.add_argument("--rounds", type=int, default=30, help="Number of communication rounds per algorithm")
+    parser.add_argument("--resume", action="store_true", help="Resume incomplete runs safely from saved checkpoints")
     args = parser.parse_args()
     
-    print(f"Starting Multi-Seed FL Execution: Seeds = {args.seeds}, Rounds = {args.rounds}")
+    print(f"Starting Multi-Seed FL Execution: Seeds = {args.seeds}, Rounds = {args.rounds}, Resume = {args.resume}")
     
     completed_summaries = []
     for s in args.seeds:
-        summary = execute_seed_experiment(seed=s, num_rounds=args.rounds)
+        summary = execute_seed_experiment(seed=s, num_rounds=args.rounds, resume=args.resume)
         completed_summaries.append(summary)
         
     if len(completed_summaries) > 0:
