@@ -29,7 +29,8 @@ class FederatedClient:
         lr: float = 0.01,
         mu: float = 0.01,
         batch_size: int = 32,
-        local_epochs: int = 2
+        local_epochs: int = 2,
+        base_seed: int = 42
     ):
         """
         Args:
@@ -42,6 +43,7 @@ class FederatedClient:
             mu: FedProx proximal coefficient.
             batch_size: Local batch size (default: 32).
             local_epochs: Local training epochs (default: 2).
+            base_seed: Base random seed for reproducible mini-batch sampling (default: 42).
         """
         self.client_id = client_id
         self.human_id = f"Client {client_id + 1}"
@@ -55,6 +57,7 @@ class FederatedClient:
         self.mu = mu
         self.batch_size = batch_size
         self.local_epochs = local_epochs
+        self.base_seed = base_seed
         
         self.loss_fn = nn.CrossEntropyLoss()
         
@@ -90,7 +93,7 @@ class FederatedClient:
         # 3. Local training loop
         for epoch in range(self.local_epochs):
             # Deterministic batch generator per client, round, and epoch
-            epoch_seed = 42 + 1000 * round_index + self.client_id + 100 * epoch
+            epoch_seed = self.base_seed + 1000 * round_index + self.client_id + 100 * epoch
             rng = np.random.default_rng(epoch_seed)
             
             # Permute client sample positions deterministically

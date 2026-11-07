@@ -16,6 +16,8 @@ data/
 
 # Binary model checkpoints (keep manifests and configs)
 experiments/checkpoints/
+experiments/legacy_seed42_pre_batch_fix/checkpoints/
+*.pt
 
 # Embedded upstream repository (maintained independently)
 third_party/PFLlib/

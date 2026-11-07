@@ -30,8 +30,9 @@ def run_fedavg(
     local_epochs: int = 2,
     run_name: str = "fedavg_pilot",
     checkpoint_dir: str = None,
-    resume: bool = True,
-    custom_jsonl_name: str = None
+    resume: bool = False,
+    custom_jsonl_name: str = None,
+    seed: int = 42
 ) -> Dict[str, Any]:
     """
     Executes a FedAvg experiment for a given number of communication rounds.
@@ -80,7 +81,8 @@ def run_fedavg(
             algorithm="FedAvg",
             lr=lr,
             batch_size=batch_size,
-            local_epochs=local_epochs
+            local_epochs=local_epochs,
+            base_seed=seed
         )
         clients.append(client)
         

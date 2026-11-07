@@ -31,8 +31,9 @@ def run_fedprox(
     local_epochs: int = 2,
     run_name: str = "fedprox_mu0.01_pilot",
     checkpoint_dir: str = None,
-    resume: bool = True,
-    custom_jsonl_name: str = None
+    resume: bool = False,
+    custom_jsonl_name: str = None,
+    seed: int = 42
 ) -> Dict[str, Any]:
     """
     Executes a FedProx experiment with proximal parameter mu.
@@ -82,7 +83,8 @@ def run_fedprox(
             lr=lr,
             mu=mu,
             batch_size=batch_size,
-            local_epochs=local_epochs
+            local_epochs=local_epochs,
+            base_seed=seed
         )
         clients.append(client)
         

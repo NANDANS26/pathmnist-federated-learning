@@ -1,0 +1,45 @@
+{
+  "study_metadata": {
+    "dataset": "PathMNIST (MedMNIST v2)",
+    "num_clients": 5,
+    "partitioning": "Dirichlet (alpha=0.3, seed=42)",
+    "label_noise": "Client 5 (40% symmetric multiclass, seeds 42/1042)",
+    "completed_communication_rounds": 30,
+    "local_epochs": 2,
+    "batch_size": 32,
+    "learning_rate": 0.01,
+    "model_architecture": "CompactPathCNN (36,425 parameters)",
+    "initial_model_hash": "1a12478a8efee52c5b412dfad926a52d349ae008bb1c67e81b405938a9f3b0c7"
+  },
+  "fedavg": {
+    "run_name": "fedavg_alpha0.3_noise40_seed42",
+    "best_validation_accuracy": 0.73291,
+    "best_validation_loss": 0.73041,
+    "best_round": 26,
+    "best_checkpoint_sha256": "bf5f4c44c72b1e913f2f793d741b40ceb094a16ab639a8d4645b470d99ccc2c3",
+    "final_test_accuracy": 0.79457,
+    "final_test_loss": 0.67212,
+    "mean_client_update_norm": 0.8492861026525497,
+    "mean_clean_noisy_alignment": -0.07611246308883306,
+    "mean_clean_clean_alignment": 0.23041404991184636,
+    "mean_round_duration_sec": 292.24503333333337,
+    "total_wall_clock_minutes": 121.05,
+    "peak_process_rss_mb": 659.31
+  },
+  "fedprox": {
+    "run_name": "fedprox_mu0.01_alpha0.3_noise40_seed42",
+    "mu": 0.01,
+    "best_validation_accuracy": 0.73361,
+    "best_validation_loss": 0.73197,
+    "best_round": 30,
+    "best_checkpoint_sha256": "6e5b05eb47ddcfafd817defa81bd6a24c074cbf9f1dce213fb5e5e12a90af375",
+    "final_test_accuracy": 0.76072,
+    "final_test_loss": 0.71425,
+    "mean_client_update_norm": 0.8189114214976629,
+    "mean_clean_noisy_alignment": -0.07582833429531302,
+    "mean_clean_clean_alignment": 0.22946584032901232,
+    "mean_round_duration_sec": 278.57343333333336,
+    "total_wall_clock_minutes": 139.32,
+    "peak_process_rss_mb": 289.76
+  }
+}
