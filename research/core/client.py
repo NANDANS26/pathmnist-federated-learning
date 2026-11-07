@@ -119,7 +119,7 @@ class FederatedClient:
                 # Preprocess batch into PyTorch float32 tensors
                 x, y = preprocess_batch(batch_imgs_raw, batch_lbls_raw)
                 
-                optimizer.zero_grad()
+                optimizer.zero_grad(set_to_none=True)
                 logits = local_model(x)
                 ce_loss = self.loss_fn(logits, y)
                 ce_loss.backward()

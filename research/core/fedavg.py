@@ -30,6 +30,7 @@ def run_fedavg(
     local_epochs: int = 2,
     run_name: str = "fedavg_pilot",
     checkpoint_dir: str = None,
+    log_dir: str = None,
     resume: bool = False,
     custom_jsonl_name: str = None,
     seed: int = 42
@@ -44,7 +45,7 @@ def run_fedavg(
         )
     os.makedirs(checkpoint_dir, exist_ok=True)
     
-    tracker = ExperimentTracker(run_name=run_name, resume=resume, custom_jsonl_name=custom_jsonl_name)
+    tracker = ExperimentTracker(run_name=run_name, log_dir=log_dir, resume=resume, custom_jsonl_name=custom_jsonl_name)
     memory_monitor = MemoryMonitor()
     
     # Check if resuming from previous checkpoint

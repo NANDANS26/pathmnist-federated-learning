@@ -52,6 +52,12 @@ class FederatedServer:
         self.sample_weights = [c / total_training_samples for c in client_sample_counts]
         
         self.loss_fn = nn.CrossEntropyLoss(reduction="sum")
+        
+        # Precompute map from validation index to client shard index
+        self.idx_to_client = {}
+        for c, indices in self.client_val_indices.items():
+            for idx in indices:
+                self.idx_to_client[idx] = c
 
     def run_communication_round(self, round_index: int) -> Dict[str, Any]:
         """
@@ -139,12 +145,6 @@ class FederatedServer:
         """
         self.global_model.eval()
         
-        # Create map from validation index to client shard index
-        idx_to_client = {}
-        for c, indices in self.client_val_indices.items():
-            for idx in indices:
-                idx_to_client[idx] = c
-                
         total_val = len(self.val_labels)
         global_loss_accum = 0.0
         global_correct_accum = 0
@@ -173,7 +173,7 @@ class FederatedServer:
             
             # Attribute to client shards
             for i, val_idx in enumerate(b_indices):
-                c = idx_to_client[val_idx]
+                c = self.idx_to_client[val_idx]
                 client_loss_accum[c] += float(ce_losses[i].item())
                 if corrects[i]:
                     client_correct_accum[c] += 1
