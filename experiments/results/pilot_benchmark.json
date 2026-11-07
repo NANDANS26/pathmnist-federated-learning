@@ -1,0 +1,42 @@
+{
+  "benchmark_date": "2026-11-07",
+  "hardware": {
+    "os": "Windows 10 Pro (64-bit)",
+    "cpu": "Intel Pentium G3240 @ 3.10GHz (2 Cores, 2 Threads)",
+    "physical_ram": "4 GB",
+    "device": "CPU"
+  },
+  "dataset": "PathMNIST (MedMNIST v2)",
+  "train_samples": 89996,
+  "val_samples": 10004,
+  "completed_pilot_rounds": 2,
+  "measurements": {
+    "fedavg_round_times_sec": [
+      275.434,
+      536.283
+    ],
+    "fedprox_round_times_sec": [
+      553.237,
+      1121.77
+    ],
+    "mean_round_duration_sec": 621.68,
+    "batches_per_round": 5630,
+    "avg_step_latency_ms": 110.42,
+    "peak_process_rss_mb": 497.95,
+    "lowest_available_ram_mb": 340.41
+  },
+  "performance": {
+    "fedavg_final_val_accuracy": 0.2532,
+    "fedavg_final_val_loss": 1.96922,
+    "fedprox_final_val_accuracy": 0.2553,
+    "fedprox_final_val_loss": 2.00649,
+    "fedavg_mean_clean_noisy_cosine": 0.23693551522299916,
+    "fedprox_mean_clean_noisy_cosine": 0.1789118851098707
+  },
+  "calibration": {
+    "mean_round_time_sec": 621.68,
+    "recommended_horizon_rounds": 30,
+    "calibration_rule_applied": "T_round (621.7s) > 120s -> Review recommended; capped at 30 rounds",
+    "estimated_full_experiment_minutes_per_algo": 310.8
+  }
+}

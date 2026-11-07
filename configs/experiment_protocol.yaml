@@ -1,0 +1,206 @@
+# ==============================================================================
+# PHASE 1 EXPERIMENTAL PROTOCOL SPECIFICATION (CORRECTED)
+# Comparative Analysis: FedAvg vs FedProx on PathMNIST with 40% Label Noise
+# Research Mentor: Dr. Sachin D N, Dept of CSE, IIIT Bhopal
+# Fellowship Target: IndiaAI Fellowship 2026-27 (Screening Submission)
+# ==============================================================================
+
+metadata:
+  protocol_version: "1.1.0"
+  phase: "Phase 1 - Formal Research Specification (Post Consistency Audit)"
+  date: "2026-11-07"
+  status: "SPECIFICATION_ONLY - PENDING_PHASE_2_USER_APPROVAL"
+  author: "Senior Federated Learning Systems Architect"
+  reference_framework: "TsingZ0/PFLlib (Untouched upstream)"
+  study_framing: "Single-seed exploratory empirical comparison (seed 42)"
+
+dataset:
+  name: "PathMNIST"
+  source: "MedMNIST v2 (NCT-CRC-HE-100K histology)"
+  num_classes: 9
+  image_resolution: [28, 28]
+  in_channels: 3
+  color_space: "RGB"
+  data_format: "uint8_numpy_in_memory"
+  splits:
+    train_total: 89996      # Distributed across 5 clients
+    val_total: 10004        # Evaluated each round (global + 5 clean shards)
+    test_total: 7180        # Held out strictly for final post-training benchmark
+    total_samples: 107180
+  storage_bytes_uint8:
+    bytes_per_image: 2352   # 28 * 28 * 3 bytes
+    train_images: 211670592 # 211.67 MB / 201.86 MiB
+    val_images: 23529408    # 23.53 MB / 22.44 MiB
+    test_images: 16887360   # 16.89 MB / 16.11 MiB
+    all_three_splits_images: 252087360 # 252.09 MB / 240.41 MiB
+    label_bytes_total: 107180          # 107.18 KB / 104.67 KiB
+    in_memory_training_footprint: "224.30 MiB (Train + Val images in RAM)"
+
+preprocessing:
+  source_layout: "NHWC ((N, 28, 28, 3), dtype uint8)"
+  target_layout: "NCHW ((B, 3, 28, 28), dtype float32)"
+  pipeline_steps:
+    - "torch.from_numpy(batch_uint8)"
+    - "permute(0, 3, 1, 2) -> NCHW"
+    - "to(torch.float32)"
+    - "div_(255.0) -> scaled strictly to [0.0, 1.0]"
+  data_augmentation: false  # None in controlled primary experiment
+  channel_normalization: false # None (pure [0.0, 1.0] scaling)
+  label_preprocessing:
+    source_shape: "(B, 1), uint8"
+    target_shape: "(B,), int64"
+    conversion: "squeeze(1).to(torch.int64)"
+    class_range: [0, 8]
+  invariance_guarantee: "Identical preprocessing applied across train, val, and test for all algorithms"
+
+federated_topology:
+  num_clients: 5
+  client_ids: [1, 2, 3, 4, 5]
+  zero_based_indices: [0, 1, 2, 3, 4]
+  participation_ratio: 1.0  # Full client participation every round (5/5 clients)
+  synchronous: true
+
+partitioning:
+  method: "dirichlet"
+  alpha: 0.3
+  partition_seed: 42
+  sample_conservation: true # sum(client_samples) == 89996
+  mutual_exclusivity: true  # intersection(client_partitions) == empty
+  arbitrary_floor_applied: false  # Pure Dirichlet draw without truncation
+  empty_client_policy:
+    allow_missing_classes: true    # Individual class sparsity is expected and recorded
+    allow_empty_client_total: false # Each client MUST have sum(samples) > 0
+    assertion: "assert min(client_sample_counts) > 0, 'Empty client partition detected'"
+    silent_reallocation_permitted: false
+
+validation_allocation:
+  method: "hamilton_hare_largest_remainder"
+  total_val_samples: 10004
+  num_shards: 5
+  seed: 42
+  sample_conservation: true # sum(val_shards) == 10004
+  mutual_exclusivity: true  # intersection(val_shards) == empty
+
+label_noise:
+  target_client_human: "Client 5"
+  target_client_index: 4     # Zero-based index
+  nominal_noise_rate: 0.40
+  noise_type: "symmetric_multiclass_flipping"
+  noise_seed: 42
+  formula: "y_tilde = (y + r) mod 9 where r in Uniform(1..8)"
+  rounding_convention: "round(0.40 * M_5)"
+  guarantee_different_class: true
+  clean_labels_preserved: true
+  noise_mask_preserved: true
+  noise_in_validation_or_test: false # 100% clean validation & test sets
+
+model:
+  architecture: "CompactPathCNN"
+  in_channels: 3
+  num_classes: 9
+  total_parameters: 36425
+  activation_function: "ReLU(inplace=False)" # Out-of-place for autograd graph clarity
+  flatten_implementation: "torch.flatten(x, 1) (zero-copy memory view)"
+  complexity_per_image:
+    macs: 4307008        # 4.31 MMACs
+    flops: 8614016       # 8.61 MFLOPs (scientific convention: 1 MAC = 2 FLOPs)
+  complexity_per_batch_32:
+    macs: 137824256      # 137.82 MMACs
+    flops: 275648512     # 275.65 MFLOPs
+    raw_input_batch_bytes: 301056  # 294.0 KiB (32 * 3 * 28 * 28 * 4 bytes)
+    individual_forward_shapes_sum_elements: 2730272 # ~10.42 MiB / 10.92 MB if materialized
+    peak_rss_claim_policy: "Static forward dimensions do NOT determine peak RSS; must measure empirically"
+  batch_norm: false
+  adaptive_pooling: "AdaptiveAvgPool2d((2, 2))"
+  initialization_seed: 42
+  checkpoint_path: "experiments/checkpoints/initial_model.pt"
+  sha256_verification_required: true
+
+optimization:
+  loss_function: "CrossEntropyLoss"
+  optimizer: "SGD"
+  learning_rate: 0.01
+  momentum: 0.0
+  weight_decay: 0.0
+  batch_size: 32
+  local_epochs: 2
+  aggregation: "sample_weighted" # sum( (n_k / 89996) * w_k )
+  fedprox:
+    mu_baseline: 0.01
+    mu_ablation_low: 0.001
+    mu_ablation_high: 0.1
+    proximal_loss_formulation: "0.5 * mu * sum((w - w_t)**2)" # Squared L2 norm
+
+execution_environment:
+  target_os: "Windows 10 Pro (64-bit)"
+  cpu_model: "Intel Pentium G3240 @ 3.10GHz"
+  physical_cores: 2
+  logical_threads: 2
+  pytorch_thread_limit: 2
+  interop_threads: 1
+  cuda_enabled: false
+  gpu_available: false
+  dataloader_workers: 0
+  pin_memory: false
+  sequential_client_execution: true
+
+provisional_parameters_requiring_pilot_calibration:
+  # MARKED AS UNVERIFIED - MUST BE CALIBRATED DURING PHASE 2 CPU PILOT
+  empirical_step_latency_ms: "TO_BE_MEASURED_IN_PHASE_2"
+  empirical_peak_rss_mb: "TO_BE_MEASURED_IN_PHASE_2 (Reference target < 1200 MB; warning > 2000 MB)"
+  memory_safety_policy:
+    emergency_ram_floor_mb: 150 # Abort immediately if available physical RAM < 150 MB
+    qualification: "150 MB floor is an emergency halt, not proof of safe execution above it"
+    additional_abort_triggers:
+      - "Observed OS disk thrashing / hard paging"
+      - "Rapid unrecovered drop in available physical memory"
+      - "Process memory growth exceeding 2500 MB RSS"
+  communication_rounds_horizon_calibration:
+    condition_fast: "T_round < 35s -> R = 100 rounds (~58 min max)"
+    condition_nominal: "35s <= T_round <= 75s -> R = 50 rounds (29 to 62.5 min)"
+    condition_slow: "75s < T_round <= 120s -> R = 30 rounds (37.5 to 60 min)"
+    condition_unviable: "T_round > 120s -> HALT and review architecture/subsampling with mentor"
+  pilot_policy: "Stage A (1-round smoke test), Stage B (2-round latency/memory test)"
+
+evaluation_and_metrics:
+  cadence: "every_communication_round"
+  timing: "post_aggregation" # Evaluates newly aggregated global model w_{t+1}
+  validation:
+    global_eval: true
+    per_client_eval: true
+    sample_weighted_consistency_check: true
+  diagnostics:
+    client_update_l2_norm: true
+    pairwise_cosine_similarity: true # 10 pairs (c1_c2 ... c4_c5)
+    clean_to_noisy_alignment: "mean(cos(clean_1..4, noisy_5))"
+    similarity_to_sample_weighted_mean: true
+  checkpoint_selection_policy:
+    primary_metric: "val/global_accuracy"
+    tie_breaker: "val/global_loss"
+    checkpoint_format: "experiments/checkpoints/{run_name}_best.pt"
+  held_out_benchmark:
+    dataset: "PathMNIST test split"
+    sample_count: 7180
+    evaluation_rule: "Each algorithm's selected best-validation checkpoint is evaluated once on the official PathMNIST test set after training has finished"
+    timing: "once_post_training"
+    metrics: ["test_accuracy", "test_loss", "macro_f1", "macro_auc_ovr", "confusion_matrix"]
+
+hypotheses_exploratory:
+  h1_magnitude_contraction: "||Delta_{5,t}^{FedProx}||_2 < ||Delta_{5,t}^{FedAvg}||_2"
+  h2_update_alignment: "mean_clean_noisy_cosine(FedProx) > mean_clean_noisy_cosine(FedAvg)"
+  h3_peak_validation_accuracy: "max_t Acc_val_FedProx(t) > max_t Acc_val_FedAvg(t)"
+  h3_stability_status: "Descriptive visual observation; not an inferential hypothesis test"
+
+logging_and_tracking:
+  local_durable_log: "experiments/logs/{run_name}_metrics.jsonl"
+  local_summary_csv: "experiments/logs/{run_name}_summary.csv"
+  wandb:
+    project: "pathmnist-fedavg-fedprox"
+    entity: null
+    mode: "offline_fallback_if_unauthenticated"
+    credentials_in_repo: false
+  runs:
+    mandatory_run_1: "fedavg_alpha0.3_noise40_seed42"
+    mandatory_run_2: "fedprox_mu0.01_alpha0.3_noise40_seed42"
+    optional_run_3: "fedprox_mu0.001_alpha0.3_noise40_seed42"
+    optional_run_4: "fedprox_mu0.1_alpha0.3_noise40_seed42"

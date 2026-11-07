@@ -1,0 +1,21 @@
+# Python virtual environment
+.venv/
+env/
+venv/
+
+# Bytecode and caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Raw data and memory-mapped files (200+ MB)
+data/
+*.npz
+*.npy
+
+# Binary model checkpoints (keep manifests and configs)
+experiments/checkpoints/
+
+# Embedded upstream repository (maintained independently)
+third_party/PFLlib/

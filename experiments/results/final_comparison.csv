@@ -1,0 +1,12 @@
+Metric,FedAvg,FedProx (mu=0.01)
+Best Validation Accuracy,0.73291,0.73361
+Best Validation Loss,0.73041,0.73197
+Selected Checkpoint Round,26,30
+Final Test Accuracy,0.79457,0.76072
+Final Test Loss,0.67212,0.71425
+Mean Client Update Norm,0.84929,0.81891
+Mean Clean-to-Noisy Alignment,-0.07611,-0.07583
+Mean Clean-to-Clean Alignment,0.23041,0.22947
+Mean Round Duration (sec),292.25,278.57
+Total Wall-Clock Time (min),121.05,139.32
+Peak Process RSS (MB),659.31,289.76

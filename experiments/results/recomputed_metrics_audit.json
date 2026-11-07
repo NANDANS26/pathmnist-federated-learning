@@ -1,0 +1,377 @@
+{
+  "forensic_audit_date": "2026-11-07",
+  "official_held_out_test_evaluation": {
+    "fedavg": {
+      "overall_accuracy": 0.79457,
+      "balanced_accuracy": 0.74176,
+      "macro_f1": 0.73784,
+      "confusion_matrix": [
+        [
+          1284,
+          0,
+          0,
+          0,
+          14,
+          21,
+          18,
+          0,
+          1
+        ],
+        [
+          0,
+          847,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          205,
+          9,
+          0,
+          27,
+          0,
+          94,
+          4
+        ],
+        [
+          3,
+          0,
+          0,
+          492,
+          60,
+          0,
+          57,
+          0,
+          22
+        ],
+        [
+          119,
+          129,
+          0,
+          15,
+          758,
+          0,
+          8,
+          1,
+          5
+        ],
+        [
+          0,
+          0,
+          107,
+          55,
+          0,
+          296,
+          1,
+          123,
+          10
+        ],
+        [
+          3,
+          0,
+          6,
+          29,
+          23,
+          2,
+          573,
+          4,
+          101
+        ],
+        [
+          0,
+          0,
+          113,
+          11,
+          7,
+          26,
+          12,
+          202,
+          50
+        ],
+        [
+          5,
+          0,
+          6,
+          13,
+          10,
+          2,
+          143,
+          6,
+          1048
+        ]
+      ],
+      "per_class": {
+        "0": {
+          "precision": 0.90806,
+          "recall": 0.95964,
+          "f1_score": 0.93314,
+          "support": 1338
+        },
+        "1": {
+          "precision": 0.86783,
+          "recall": 1.0,
+          "f1_score": 0.92924,
+          "support": 847
+        },
+        "2": {
+          "precision": 0.46911,
+          "recall": 0.60472,
+          "f1_score": 0.52835,
+          "support": 339
+        },
+        "3": {
+          "precision": 0.78846,
+          "recall": 0.77603,
+          "f1_score": 0.78219,
+          "support": 634
+        },
+        "4": {
+          "precision": 0.86927,
+          "recall": 0.73237,
+          "f1_score": 0.79497,
+          "support": 1035
+        },
+        "5": {
+          "precision": 0.79144,
+          "recall": 0.5,
+          "f1_score": 0.61284,
+          "support": 592
+        },
+        "6": {
+          "precision": 0.70567,
+          "recall": 0.77328,
+          "f1_score": 0.73793,
+          "support": 741
+        },
+        "7": {
+          "precision": 0.46977,
+          "recall": 0.47981,
+          "f1_score": 0.47474,
+          "support": 421
+        },
+        "8": {
+          "precision": 0.84448,
+          "recall": 0.84996,
+          "f1_score": 0.84721,
+          "support": 1233
+        }
+      },
+      "test_loss": 0.67212,
+      "checkpoint_path": "D:\\NANDAN.S\\ENGINEERING\\GITHUB ISSUES\\pathmnist-federated-learning\\experiments\\checkpoints\\fedavg_alpha0.3_noise40_seed42_best.pt",
+      "checkpoint_sha256": "bf5f4c44c72b1e913f2f793d741b40ceb094a16ab639a8d4645b470d99ccc2c3",
+      "total_test_samples": 7180
+    },
+    "fedprox": {
+      "overall_accuracy": 0.76072,
+      "balanced_accuracy": 0.68659,
+      "macro_f1": 0.69046,
+      "confusion_matrix": [
+        [
+          1210,
+          25,
+          19,
+          0,
+          0,
+          53,
+          8,
+          0,
+          23
+        ],
+        [
+          0,
+          847,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          3,
+          96,
+          6,
+          0,
+          171,
+          0,
+          60,
+          3
+        ],
+        [
+          0,
+          0,
+          1,
+          465,
+          9,
+          0,
+          75,
+          0,
+          84
+        ],
+        [
+          101,
+          194,
+          0,
+          4,
+          714,
+          3,
+          7,
+          1,
+          11
+        ],
+        [
+          0,
+          0,
+          71,
+          55,
+          0,
+          427,
+          0,
+          27,
+          12
+        ],
+        [
+          2,
+          0,
+          5,
+          14,
+          15,
+          3,
+          357,
+          0,
+          345
+        ],
+        [
+          0,
+          0,
+          80,
+          6,
+          6,
+          82,
+          5,
+          175,
+          67
+        ],
+        [
+          4,
+          0,
+          7,
+          6,
+          0,
+          2,
+          41,
+          2,
+          1171
+        ]
+      ],
+      "per_class": {
+        "0": {
+          "precision": 0.91875,
+          "recall": 0.90433,
+          "f1_score": 0.91149,
+          "support": 1338
+        },
+        "1": {
+          "precision": 0.79233,
+          "recall": 1.0,
+          "f1_score": 0.88413,
+          "support": 847
+        },
+        "2": {
+          "precision": 0.34409,
+          "recall": 0.28319,
+          "f1_score": 0.31068,
+          "support": 339
+        },
+        "3": {
+          "precision": 0.83633,
+          "recall": 0.73344,
+          "f1_score": 0.78151,
+          "support": 634
+        },
+        "4": {
+          "precision": 0.95968,
+          "recall": 0.68986,
+          "f1_score": 0.8027,
+          "support": 1035
+        },
+        "5": {
+          "precision": 0.57625,
+          "recall": 0.72128,
+          "f1_score": 0.64066,
+          "support": 592
+        },
+        "6": {
+          "precision": 0.72414,
+          "recall": 0.48178,
+          "f1_score": 0.57861,
+          "support": 741
+        },
+        "7": {
+          "precision": 0.66038,
+          "recall": 0.41568,
+          "f1_score": 0.5102,
+          "support": 421
+        },
+        "8": {
+          "precision": 0.6824,
+          "recall": 0.94972,
+          "f1_score": 0.79417,
+          "support": 1233
+        }
+      },
+      "test_loss": 0.71425,
+      "checkpoint_path": "D:\\NANDAN.S\\ENGINEERING\\GITHUB ISSUES\\pathmnist-federated-learning\\experiments\\checkpoints\\fedprox_mu0.01_alpha0.3_noise40_seed42_best.pt",
+      "checkpoint_sha256": "6e5b05eb47ddcfafd817defa81bd6a24c074cbf9f1dce213fb5e5e12a90af375",
+      "total_test_samples": 7180
+    }
+  },
+  "raw_jsonl_log_reconstruction": {
+    "fedavg": {
+      "file_path": "D:\\NANDAN.S\\ENGINEERING\\GITHUB ISSUES\\pathmnist-federated-learning\\experiments\\logs\\fedavg_metrics.jsonl",
+      "total_rounds_logged": 30,
+      "best_round": 26,
+      "best_val_accuracy": 0.73291,
+      "best_val_loss": 0.73041,
+      "mean_round_duration_sec": 292.25,
+      "total_duration_minutes": 146.12,
+      "peak_rss_mb": 659.31,
+      "mean_clean_noisy_alignment": -0.07611,
+      "mean_clean_clean_consensus": 0.23041,
+      "mean_update_norms": {
+        "client_1": 0.937647670507431,
+        "client_2": 1.0598170936107636,
+        "client_3": 0.6977909843126933,
+        "client_4": 0.6411204566558202,
+        "client_5": 0.9100543081760406
+      }
+    },
+    "fedprox": {
+      "file_path": "D:\\NANDAN.S\\ENGINEERING\\GITHUB ISSUES\\pathmnist-federated-learning\\experiments\\logs\\fedprox_metrics.jsonl",
+      "total_rounds_logged": 30,
+      "best_round": 30,
+      "best_val_accuracy": 0.73361,
+      "best_val_loss": 0.73197,
+      "mean_round_duration_sec": 278.57,
+      "total_duration_minutes": 139.29,
+      "peak_rss_mb": 289.76,
+      "mean_clean_noisy_alignment": -0.07583,
+      "mean_clean_clean_consensus": 0.22947,
+      "mean_update_norms": {
+        "client_1": 0.893801893790563,
+        "client_2": 1.0014537890752158,
+        "client_3": 0.6793625235557557,
+        "client_4": 0.6316530038913091,
+        "client_5": 0.888285897175471
+      }
+    }
+  }
+}
