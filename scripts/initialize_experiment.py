@@ -84,5 +84,9 @@ def initialize_all():
     print("\n=== EXPERIMENTAL INITIALIZATION COMPLETE ===")
 
 
-if __name__ == "__main__":
+def main():
     initialize_all()
+
+
+if __name__ == "__main__":
+    main()
