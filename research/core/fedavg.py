@@ -96,7 +96,9 @@ def run_fedavg(
         memory_monitor=memory_monitor
     )
     
-    print(f"=== Starting FedAvg Run: {run_name} ({start_round} to {num_rounds} rounds) ===")
+    run_start_time = time.perf_counter()
+    total_samples_round = sum(c.num_samples for c in clients) * local_epochs
+    print(f"=== Starting FedAvg Run: {run_name} ({start_round} to {num_rounds} rounds, {total_samples_round} samples/round) ===", flush=True)
     
     for r in range(start_round, num_rounds + 1):
         metrics = server.run_communication_round(round_index=r)
@@ -107,11 +109,14 @@ def run_fedavg(
         duration = metrics["round_duration_seconds"]
         rss = metrics["process_rss_mb"]
         avail_ram = metrics["system_available_mb"]
+        elapsed_sec = time.perf_counter() - run_start_time
         
         print(
-            f"[Round {r:02d}/{num_rounds:02d}] "
+            f"[{run_name} | Round {r:02d}/{num_rounds:02d}] "
             f"Val Acc: {val_acc:.4f} | Val Loss: {val_loss:.4f} | "
-            f"Time: {duration:.1f}s | RSS: {rss:.1f}MB | Avail RAM: {avail_ram:.1f}MB"
+            f"Round Time: {duration:.1f}s | Elapsed: {elapsed_sec/60.0:.1f}m | "
+            f"RSS: {rss:.1f}MB | Avail RAM: {avail_ram:.1f}MB",
+            flush=True
         )
         
         # Save latest checkpoint after every completed round
@@ -131,6 +136,9 @@ def run_fedavg(
             best_round = r
             best_ckpt_path = os.path.join(checkpoint_dir, f"{run_name}_best.pt")
             torch.save(global_model.state_dict(), best_ckpt_path)
+            print(f"  -> [CHECKPOINT] Saved NEW BEST model at round {r} (Val Acc: {val_acc:.4f}, Val Loss: {val_loss:.4f})", flush=True)
+        else:
+            print(f"  -> [CHECKPOINT] Saved latest checkpoint at round {r}", flush=True)
             
     # Save final model
     final_ckpt_path = os.path.join(checkpoint_dir, f"{run_name}_final.pt")

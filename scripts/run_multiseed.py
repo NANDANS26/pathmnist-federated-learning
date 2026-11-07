@@ -48,7 +48,7 @@ def get_git_commit_hash() -> str:
         return "c6159b0_untracked"
 
 
-def execute_seed_experiment(seed: int, num_rounds: int = 30, resume: bool = False) -> dict:
+def execute_seed_experiment(seed: int, num_rounds: int = 30) -> dict:
     """
     Executes a complete paired FedAvg and FedProx experiment for a specific seed.
     Guarantees isolated directory storage, immutable metadata, zero checkpoint reuse,
@@ -58,21 +58,33 @@ def execute_seed_experiment(seed: int, num_rounds: int = 30, resume: bool = Fals
     iso_start_time = datetime.datetime.now(datetime.timezone.utc).isoformat()
     git_hash = get_git_commit_hash()
     
-    print(f"\n{'='*75}")
-    print(f"   EXECUTING IMMUTABLE PAIRED EXPERIMENT: SEED {seed} ({num_rounds} ROUNDS, RESUME={resume})   ")
-    print(f"   Git Commit: {git_hash} | Start UTC: {iso_start_time}")
-    print(f"{'='*75}")
+    print(f"\n{'='*75}", flush=True)
+    print(f"   EXECUTING IMMUTABLE PAIRED EXPERIMENT: SEED {seed} ({num_rounds} ROUNDS)   ", flush=True)
+    print(f"   Git Commit: {git_hash} | Start UTC: {iso_start_time}", flush=True)
+    print(f"{'='*75}\n", flush=True)
     
     seed_dir = os.path.join(PROJ_ROOT, "experiments", f"seed_{seed}")
     config_dir = os.path.join(seed_dir, "configs")
     ckpt_dir = os.path.join(seed_dir, "checkpoints")
     log_dir = os.path.join(seed_dir, "logs")
     results_dir = os.path.join(seed_dir, "results")
+    status_file = os.path.join(seed_dir, "run_status.json")
     
     os.makedirs(config_dir, exist_ok=True)
     os.makedirs(ckpt_dir, exist_ok=True)
     os.makedirs(log_dir, exist_ok=True)
     os.makedirs(results_dir, exist_ok=True)
+    
+    # Initialize run status tracker
+    status_data = {
+        "status": "INITIALIZING",
+        "seed": seed,
+        "current_stage": "DATA_PREPARATION",
+        "start_utc": iso_start_time,
+        "last_update_utc": datetime.datetime.now(datetime.timezone.utc).isoformat()
+    }
+    with open(status_file, "w", encoding="utf-8") as f:
+        json.dump(status_data, f, indent=2)
     
     # 1. Dataset Checksum & In-RAM Data Loading
     t_data_0 = time.perf_counter()
@@ -127,19 +139,26 @@ def execute_seed_experiment(seed: int, num_rounds: int = 30, resume: bool = Fals
     print(f"Data partitioning & setup complete ({data_prep_overhead_sec}s). Partition SHA: {partition_manifest_sha256[:12]}...")
     
     # 3. Canonical Shared Initial Model Checkpoint
+    torch.manual_seed(seed)
+    init_model = CompactPathCNN(in_channels=3, num_classes=9)
+    init_hash = compute_canonical_model_hash(init_model)
     init_ckpt_path = os.path.join(ckpt_dir, "initial_model.pt")
-    if not (resume and os.path.exists(init_ckpt_path)):
-        torch.manual_seed(seed)
-        init_model = CompactPathCNN(in_channels=3, num_classes=9)
-        init_hash = compute_canonical_model_hash(init_model)
-        torch.save(init_model.state_dict(), init_ckpt_path)
+    torch.save(init_model.state_dict(), init_ckpt_path)
     init_model_sha256 = compute_file_sha256(init_ckpt_path)
-    print(f"Initial model instantiated/loaded: SHA-256 = {init_model_sha256}")
+    print(f"Initial model instantiated: SHA-256 = {init_model_sha256}")
     
     # 4. Primary Run 1: FedAvg
     fedavg_run_name = f"fedavg_alpha0.3_noise40_seed{seed}"
     model_fedavg = CompactPathCNN(in_channels=3, num_classes=9)
     model_fedavg.load_state_dict(torch.load(init_ckpt_path))
+    
+    status_data.update({
+        "status": "RUNNING_FEDAVG",
+        "current_stage": "FEDAVG_TRAINING",
+        "last_update_utc": datetime.datetime.now(datetime.timezone.utc).isoformat()
+    })
+    with open(status_file, "w", encoding="utf-8") as f:
+        json.dump(status_data, f, indent=2)
     
     t0_avg = time.perf_counter()
     iso_avg_start = datetime.datetime.now(datetime.timezone.utc).isoformat()
@@ -159,11 +178,21 @@ def execute_seed_experiment(seed: int, num_rounds: int = 30, resume: bool = Fals
         run_name=fedavg_run_name,
         checkpoint_dir=ckpt_dir,
         log_dir=log_dir,
-        resume=resume,
+        resume=False,
         seed=seed
     )
     dur_avg_sec = float(round(time.perf_counter() - t0_avg, 3))
     iso_avg_end = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    
+    status_data.update({
+        "status": "COMPLETED_FEDAVG",
+        "current_stage": "FEDPROX_TRAINING",
+        "fedavg_completed_rounds": num_rounds,
+        "fedavg_wall_clock_minutes": float(round(dur_avg_sec / 60.0, 2)),
+        "last_update_utc": datetime.datetime.now(datetime.timezone.utc).isoformat()
+    })
+    with open(status_file, "w", encoding="utf-8") as f:
+        json.dump(status_data, f, indent=2)
     
     # 5. Primary Run 2: FedProx (mu=0.01)
     fedprox_run_name = f"fedprox_mu0.01_alpha0.3_noise40_seed{seed}"
@@ -189,11 +218,21 @@ def execute_seed_experiment(seed: int, num_rounds: int = 30, resume: bool = Fals
         run_name=fedprox_run_name,
         checkpoint_dir=ckpt_dir,
         log_dir=log_dir,
-        resume=resume,
+        resume=False,
         seed=seed
     )
     dur_prox_sec = float(round(time.perf_counter() - t0_prox, 3))
     iso_prox_end = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    
+    status_data.update({
+        "status": "COMPLETED_FEDPROX",
+        "current_stage": "HELD_OUT_TEST_EVALUATION",
+        "fedprox_completed_rounds": num_rounds,
+        "fedprox_wall_clock_minutes": float(round(dur_prox_sec / 60.0, 2)),
+        "last_update_utc": datetime.datetime.now(datetime.timezone.utc).isoformat()
+    })
+    with open(status_file, "w", encoding="utf-8") as f:
+        json.dump(status_data, f, indent=2)
     
     # 6. Strict Post-Training Held-Out Test Evaluation
     fedavg_best_ckpt = os.path.join(ckpt_dir, f"{fedavg_run_name}_best.pt")
@@ -338,12 +377,22 @@ def execute_seed_experiment(seed: int, num_rounds: int = 30, resume: bool = Fals
     with open(summary_path, "w", encoding="utf-8") as f:
         json.dump(seed_summary, f, indent=2)
         
-    print(f"\n{'='*75}")
-    print(f"   SEED {seed} EXECUTION SUMMARY")
-    print(f"   FedAvg  (Round {res_fedavg['best_round']:02d}): Test Acc = {test_metrics_avg['overall_accuracy']*100:.3f}% | Macro-F1 = {test_metrics_avg['macro_f1']:.4f} | Time: {timing_reconciliation['fedavg']['wall_clock_minutes']}m")
-    print(f"   FedProx (Round {res_fedprox['best_round']:02d}): Test Acc = {test_metrics_prox['overall_accuracy']*100:.3f}% | Macro-F1 = {test_metrics_prox['macro_f1']:.4f} | Time: {timing_reconciliation['fedprox']['wall_clock_minutes']}m")
-    print(f"   Paired Test Acc Delta (FedProx - FedAvg): {seed_summary['paired_delta']['test_accuracy_delta']*100:+.3f}%")
-    print(f"{'='*75}\n")
+    status_data.update({
+        "status": "COMPLETED",
+        "current_stage": "FINISHED",
+        "end_utc": iso_end_time,
+        "total_seed_wall_clock_minutes": timing_reconciliation["total_seed_wall_clock_minutes"],
+        "last_update_utc": datetime.datetime.now(datetime.timezone.utc).isoformat()
+    })
+    with open(status_file, "w", encoding="utf-8") as f:
+        json.dump(status_data, f, indent=2)
+        
+    print(f"\n{'='*75}", flush=True)
+    print(f"   SEED {seed} EXECUTION SUMMARY", flush=True)
+    print(f"   FedAvg  (Round {res_fedavg['best_round']:02d}): Test Acc = {test_metrics_avg['overall_accuracy']*100:.3f}% | Macro-F1 = {test_metrics_avg['macro_f1']:.4f} | Time: {timing_reconciliation['fedavg']['wall_clock_minutes']}m", flush=True)
+    print(f"   FedProx (Round {res_fedprox['best_round']:02d}): Test Acc = {test_metrics_prox['overall_accuracy']*100:.3f}% | Macro-F1 = {test_metrics_prox['macro_f1']:.4f} | Time: {timing_reconciliation['fedprox']['wall_clock_minutes']}m", flush=True)
+    print(f"   Paired Test Acc Delta (FedProx - FedAvg): {seed_summary['paired_delta']['test_accuracy_delta']*100:+.3f}%", flush=True)
+    print(f"{'='*75}\n", flush=True)
     return seed_summary
 
 
@@ -430,14 +479,13 @@ def main():
     parser = argparse.ArgumentParser(description="Multi-Seed FL Orchestrator")
     parser.add_argument("--seeds", type=int, nargs="+", default=[42], help="List of seeds to execute")
     parser.add_argument("--rounds", type=int, default=30, help="Number of communication rounds per algorithm")
-    parser.add_argument("--resume", action="store_true", help="Resume incomplete runs safely from saved checkpoints")
     args = parser.parse_args()
     
-    print(f"Starting Multi-Seed FL Execution: Seeds = {args.seeds}, Rounds = {args.rounds}, Resume = {args.resume}")
+    print(f"Starting Multi-Seed FL Execution: Seeds = {args.seeds}, Rounds = {args.rounds}")
     
     completed_summaries = []
     for s in args.seeds:
-        summary = execute_seed_experiment(seed=s, num_rounds=args.rounds, resume=args.resume)
+        summary = execute_seed_experiment(seed=s, num_rounds=args.rounds)
         completed_summaries.append(summary)
         
     if len(completed_summaries) > 0:
