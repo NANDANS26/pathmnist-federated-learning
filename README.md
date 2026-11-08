@@ -32,7 +32,7 @@ The study uses the official **PathMNIST** dataset from the [MedMNIST v2](https:/
   - **Validation Split:** Exactly 10,004 images `(10004, 28, 28, 3)` and labels `(10004, 1)`, `uint8`.
   - **Test Split:** Exactly 7,180 images `(7180, 28, 28, 3)` and labels `(7180, 1)`, `uint8`.
 - **Cryptographic Verification:**
-  - Official MedMNIST v2 archive: `data/pathmnist.npz` (216,423,010 bytes).
+  - Official MedMNIST v2 archive: `data/pathmnist.npz` (205,615,438 bytes, ~196.09 MiB).
   - MD5: `a8b06965200029087d5bd730944a56c1` (Exact match with official benchmark).
   - SHA-256: `81823f52dc622e69db2db4c72f8e8e617938dd6864d3c1f23d4e49724a28ea72`.
 - **Quarantine & Zero-Leakage Policy:** The 7,180-sample test split is strictly quarantined during training. It is evaluated exactly once post-training on the optimal validation checkpoint (zero exposure during model training or checkpoint selection).
@@ -290,3 +290,16 @@ All experiments in this submission were executed on an entry-level physical CPU 
 - **Hypothesized Mechanism:** Proximal contraction penalty ($\mu = 0.01$) constrained clean clients from taking sufficiently large update steps away from the noisy global average $w_t$, contributing to recall collapse on classes heavily represented on the noisy client (Class 2: 28.32% vs 60.47%; Class 6: 48.18% vs 77.33%).
 
 See [`PROJECT_STATUS.md`](PROJECT_STATUS.md) for live milestone tracking and [`reports/`](reports/) for complete technical audits.
+
+---
+
+## 16. Licensing & Dataset Provenance
+
+### Software Code License
+The source code, scripts, unit tests, configuration files, and experimental orchestration pipelines in this repository are licensed under the [MIT License](LICENSE) (Copyright (c) 2026 NANDAN S).
+
+### Dataset License & Attribution
+The **PathMNIST** dataset used in this research is part of the [MedMNIST v2](https://medmnist.com/) biomedical benchmark suite (Yang et al., *Scientific Data* 2023; Kather et al., *PLOS Medicine* 2019) and is distributed under the **Creative Commons Attribution 4.0 International (CC BY 4.0)** license via Zenodo ([Record 10519652](https://zenodo.org/records/10519652)).
+- The project's MIT license applies exclusively to the research code, scripts, configuration, and documentation developed in this repository.
+- The PathMNIST dataset is **not** covered by the MIT license; it is downloaded separately from official sources and remains governed by its native CC BY 4.0 license.
+
