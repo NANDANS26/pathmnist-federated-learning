@@ -4,13 +4,14 @@
 **Academic Supervision:** Dr. Sachin D N, Assistant Professor, Department of CSE, IIIT Bhopal  
 **Fellowship Programme:** IndiaAI Fellowship 2026–27 (Research Screening Submission)  
 **Repository:** [https://github.com/NANDANS26/pathmnist-federated-learning](https://github.com/NANDANS26/pathmnist-federated-learning)  
+**Pushed Base Commit SHA:** `dd7b810130a7dcda1d4487ce1b5d877bf4b4575b` (short: `dd7b810`)
 **Date:** November 2026  
 
 ---
 
 ## 1. Executive Summary
 
-This report documents the final publication, independent verification, and technical consistency audits conducted across Phases 5, 5B, and 5C for the public GitHub release of the PathMNIST Federated Learning benchmark.
+This report documents the final publication, independent verification, and technical consistency audits conducted across Phases 5, 5B, 5C, and 5D for the public GitHub release of the PathMNIST Federated Learning benchmark.
 
 All repository components—including the core federated training algorithms, dataset acquisition and partitioning pipelines, local perturbation optimizers, unit test suites, and historical artifacts—have been reconciled, cryptographically audited, and confirmed to be fully functional and reproducible.
 
@@ -52,11 +53,11 @@ $$\begin{aligned}
 \end{aligned}$$
 
 ### Note on Prior Phase 5B Textual Summary:
-In an intermediate textual summary of Phase 5B, the architecture was erroneously described in prose as `3 -> 16 -> 32`. The codebase (`research/models/compact_cnn.py`), the canonical initial model hash (`b30f8ea6...`), the unit test suite (`research/tests/test_model_architecture.py`), and the published `README.md` have consistently and exclusively implemented and documented the true `3 -> 32 -> 64` configuration with 36,425 parameters. No model alterations were required or permitted.
+In an intermediate textual summary of Phase 5B, the architecture was erroneously described in prose as `3 -> 16 -> 32`. The codebase (`research/models/compact_cnn.py`), the canonical initial model hash (`b30f8ea6...`), the unit test suite (`research/tests/test_model.py`), and the published `README.md` have consistently and exclusively implemented and documented the true `3 -> 32 -> 64` configuration with 36,425 parameters. No model alterations were required or permitted.
 
 ---
 
-## 3. Dataset Integrity, Checksums & Official Metadata
+## 3. Dataset Integrity, Checksums & Size Reconciliation
 
 ### Environmental Audit:
 - **Installed MedMNIST Package:** Version `3.0.2`
@@ -64,18 +65,41 @@ In an intermediate textual summary of Phase 5B, the architecture was erroneously
   - URL: `https://zenodo.org/records/10519652/files/pathmnist.npz?download=1`
   - Expected MD5: `a8b06965200029087d5bd730944a56c1`
   - Samples: Train: 89,996; Val: 10,004; Test: 7,180 (Total: 107,180)
-- **Local File Inspection (`data/pathmnist.npz`):**
-  - Actual File Size: **205,615,438 bytes** (~196.09 MiB)
-  - Actual MD5: **`a8b06965200029087d5bd730944a56c1`**
-  - Actual SHA-256: **`81823f52dc622e69db2db4c72f8e8e617938dd6864d3c1f23d4e49724a28ea72`**
-  - Integrity Check Status: **100% MATCH** (`actual_md5 == expected_md5` evaluates to `True`)
+
+### Independent Verification of Local Archive (`data/pathmnist.npz`):
+All four independent methods confirm exact concordance:
+1. `(Get-Item data/pathmnist.npz).Length`: **`205615438`** bytes
+2. `Python os.path.getsize('data/pathmnist.npz')`: **`205615438`** bytes
+3. `Get-FileHash -Algorithm MD5`: **`A8B06965200029087D5BD730944A56C1`** (Matches official MedMNIST MD5)
+4. `Get-FileHash -Algorithm SHA256`: **`81823F52DC622E69DB2DB4C72F8E8E617938DD6864D3C1F23D4E49724A28EA72`**
+- **Integrity Status:** **100% MATCH** (`actual_md5 == expected_md5` evaluates to `True`).
+
+### Dataset Size Reconciliation Across Repository:
+A complete repository audit identified all occurrences of dataset size representations:
+- **`205615438` bytes (Authoritative):**
+  - `experiments/manifests/dataset_manifest.json` (line 6)
+  - `experiments/legacy_seed42_pre_batch_fix/manifests/dataset_manifest.json` (line 6)
+  - `README.md` (line 35)
+  - `reports/PHASE_5_PUBLICATION_AND_VERIFICATION_REPORT.md` (this report)
+- **`216423010` bytes (Legacy Documentation Draft Typo):**
+  - `reports/PHASE_2_EXECUTION_REPORT.md` (line 52)
+  - `reports/PHASE_4_SCIENTIFIC_HARDENING_REPORT.md` (line 25)
+  - *Correction:* The programmatic manifests produced during execution have always recorded `205615438`. The stale prose value `216,423,010` was a manual table draft error and has been explicitly annotated in both historical reports as part of Phase 5D.
 
 ### Clarification on Checksum Provenance:
-All repository-persisted manifests (`experiments/manifests/dataset_manifest.json`, `experiments/legacy_seed42_pre_batch_fix/manifests/dataset_manifest.json`), historical phase reports (Phases 2, 3, and 4), and `PROJECT_STATUS.md` have consistently recorded `a8b06965200029087d5bd730944a56c1`. The string `12fa4b1b36913c19659b870a24a5be9a` cited in the Phase 5B narrative was an isolated conversational hallucination and did not originate from any file, metadata, or download.
+All repository-persisted manifests, historical phase reports (Phases 2, 3, and 4), and `PROJECT_STATUS.md` have consistently recorded `a8b06965200029087d5bd730944a56c1`. The string `12fa4b1b36913c19659b870a24a5be9a` cited in the Phase 5B narrative was an isolated conversational hallucination and did not originate from any file, metadata, or download.
 
 ---
 
-## 4. Licensing and Dataset Provenance Separation
+## 4. Git Commit SHA Reconciliation
+
+- **Verified Remote HEAD (`origin/main`):** `dd7b810130a7dcda1d4487ce1b5d877bf4b4575b` (short: `dd7b810`)
+- **Verified Local HEAD:** `dd7b810130a7dcda1d4487ce1b5d877bf4b4575b`
+- **Reconciliation Note:** In the conversational response for Phase 5C, the short SHA `dd7b810` was correctly identified, but an incorrect 40-character SHA string (`dd7b8105781a7cf724578b663bfe1ff21ddbe5c1`) was emitted with an artificial suffix. The true, authoritative 40-character Git commit SHA is confirmed as `dd7b810130a7dcda1d4487ce1b5d877bf4b4575b`.
+
+---
+
+## 5. Licensing and Dataset Provenance Separation
 
 The repository maintains an unambiguous separation between software intellectual property and scientific dataset licensing:
 1. **Source Code & Pipelines:**
@@ -89,7 +113,7 @@ The repository maintains an unambiguous separation between software intellectual
 
 ---
 
-## 5. Verification Checklist & Repository Health
+## 6. Verification Checklist & Repository Health
 
 | Requirement | Audit Command / Method | Result | Status |
 | :--- | :--- | :--- | :---: |
@@ -104,6 +128,6 @@ The repository maintains an unambiguous separation between software intellectual
 
 ---
 
-## 6. Conclusion
+## 7. Conclusion
 
 The repository is mathematically sound, fully documented, cryptographically verified, and ready for review and multi-seed execution under IndiaAI Fellowship guidelines.

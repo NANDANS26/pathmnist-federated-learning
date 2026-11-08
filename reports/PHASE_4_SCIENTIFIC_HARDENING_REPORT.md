@@ -22,7 +22,7 @@
 
 ### 1.1 Dataset Integrity & Split Isolation
 Every split of the official PathMNIST dataset was independently audited from raw bytes on disk:
-- **Dataset File:** `pathmnist-federated-learning/data/pathmnist.npz` (216,423,010 bytes).
+- **Dataset File:** `pathmnist-federated-learning/data/pathmnist.npz` (205,615,438 bytes; note: earlier text cited 216,423,010 bytes in error, reconciled in Phase 5D audit).
 - **Cryptographic Checksums:**
   - MD5: `a8b06965200029087d5bd730944a56c1` (Exact match with official MedMNIST v2 benchmark specification).
   - SHA-256: `81823f52dc622e69db2db4c72f8e8e617938dd6864d3c1f23d4e49724a28ea72`.

@@ -49,7 +49,7 @@ The official PathMNIST dataset was acquired directly via the MedMNIST v3 Python 
 | Property | Value | Verification Status |
 | :--- | :--- | :--- |
 | **Dataset Name** | `pathmnist.npz` | MedMNIST v2 Benchmark |
-| **Local File Location**| `pathmnist-federated-learning/data/pathmnist.npz` | Verified (216,423,010 bytes / 206.40 MB) |
+| **Local File Location**| `pathmnist-federated-learning/data/pathmnist.npz` | Verified (205,615,438 bytes / 196.09 MiB; note: earlier draft recorded 216,423,010 bytes in error, reconciled in Phase 5D audit) |
 | **MD5 Checksum** | `a8b06965200029087d5bd730944a56c1` | **MATCH** (Exact official MedMNIST v2 MD5) |
 | **SHA-256 Checksum** | `81823f52dc622e69db2db4c72f8e8e617938dd6864d3c1f23d4e49724a28ea72` | **MATCH** |
 | **Training Split** | 89,996 images `(89996, 28, 28, 3)`, uint8 | Verified |
