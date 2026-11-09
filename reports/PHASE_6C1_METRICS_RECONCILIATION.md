@@ -6,7 +6,6 @@
 **Inspected Experiment Attempt:** `experiments/seed_42_attempt_2/`  
 **Date:** November 8, 2026  
 **Auditor:** Antigravity Research Infrastructure Agent  
-**Academic Supervision:** Dr. Sachin D N, Assistant Professor, Department of CSE, IIIT Bhopal  
 
 ---
 

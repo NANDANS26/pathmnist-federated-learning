@@ -1,6 +1,5 @@
 """
 Dirichlet Non-IID Client Partitioning for Federated Learning.
-Supervised by Dr. Sachin D N, IIIT Bhopal.
 """
 
 import json

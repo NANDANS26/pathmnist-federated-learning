@@ -1,6 +1,5 @@
 """
 Unit tests for 40% Symmetric Label Noise Injection on Client 5.
-Supervised by Dr. Sachin D N, IIIT Bhopal.
 """
 
 import pytest

@@ -2,7 +2,6 @@
 Phase 2 CPU Pilot Benchmark Runner.
 Executes 2-round pilot runs for FedAvg and FedProx (mu=0.01) on real PathMNIST non-IID partitions,
 records batch latency, round time, peak RSS, and calibrates communication horizon.
-Supervised by Dr. Sachin D N, IIIT Bhopal.
 """
 
 import sys

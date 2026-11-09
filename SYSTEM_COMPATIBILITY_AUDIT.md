@@ -3,7 +3,6 @@
 **Date of Audit:** November 8, 2026  
 **Auditor:** Antigravity Autonomous Coding Agent  
 **Academic Project:** Comparative Experimental Analysis of FedAvg vs FedProx ($\mu = 0.01$) on Non-IID PathMNIST with 40% Label Noise  
-**Faculty Mentor:** Dr. Sachin D N, Assistant Professor, Department of CSE, IIIT Bhopal  
 **Audit Destination:** `pathmnist-federated-learning-audit`  
 
 ---

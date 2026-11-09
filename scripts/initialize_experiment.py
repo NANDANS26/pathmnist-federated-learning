@@ -1,7 +1,6 @@
 """
 Experiment Artifact Initializer.
 Generates deterministic partition manifest, validation manifest, noise manifest, and initial model checkpoint.
-Supervised by Dr. Sachin D N, IIIT Bhopal.
 """
 
 import sys

@@ -1,6 +1,5 @@
 # PHASE 6C — SEED 42 PAIRED SMOKE EXPERIMENT REPORT
 
-**Supervised by:** Dr. Sachin D N, Assistant Professor, Department of Computer Science & Engineering, IIIT Bhopal  
 **Evaluation Scope:** IndiaAI Fellowship Research Assessment  
 **Repository:** [NANDANS26/pathmnist-federated-learning](https://github.com/NANDANS26/pathmnist-federated-learning)  
 **Branch:** `main` | **Verified HEAD Commit:** `64ce6da727c8f039b069ff030759e33f74abd69f`  

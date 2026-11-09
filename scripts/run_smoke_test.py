@@ -1,7 +1,6 @@
 """
 1-Round Functional Smoke Test on Synthetic Dataset.
 Verifies client training, FedAvg/FedProx optimization, metrics, JSONL logging, and checkpointing.
-Supervised by Dr. Sachin D N, IIIT Bhopal.
 """
 
 import sys

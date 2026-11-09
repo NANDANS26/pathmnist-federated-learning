@@ -1,6 +1,5 @@
 """
 Unit tests for Dirichlet Partitioning and Validation Apportionment.
-Supervised by Dr. Sachin D N, IIIT Bhopal.
 """
 
 import pytest

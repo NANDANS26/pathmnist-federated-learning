@@ -1,6 +1,5 @@
 """
 Unit tests for End-to-End Experimental Reproducibility.
-Supervised by Dr. Sachin D N, IIIT Bhopal.
 """
 
 import pytest

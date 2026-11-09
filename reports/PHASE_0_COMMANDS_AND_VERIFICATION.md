@@ -1,7 +1,6 @@
 # PHASE 0: COMMANDS AND VERIFICATION AUDIT LOG
 
 **Project:** Federated Learning on PathMNIST (FedAvg vs. FedProx)  
-**Research Supervision:** Dr. Sachin D N, Assistant Professor, Dept. of CSE, IIIT Bhopal  
 **Fellowship Program:** IndiaAI Fellowship 2026–27 Screening Submission  
 **Host Shell:** Windows PowerShell / Antigravity Terminal  
 **Working Directory:** `d:\NANDAN.S\ENGINEERING\GITHUB ISSUES`  

@@ -1,7 +1,6 @@
 """
 Hardware Memory and System Resource Monitoring.
 Protects dual-core 4 GB RAM Windows host from OS thrashing and pagefile collapse.
-Supervised by Dr. Sachin D N, IIIT Bhopal.
 """
 
 import os

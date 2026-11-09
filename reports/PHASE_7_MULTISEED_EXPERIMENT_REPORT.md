@@ -2,7 +2,6 @@
 ## Rigorous Statistical Benchmark: FedAvg vs. FedProx ($\mu = 0.01$) Across 5 Canonical Seeds on PathMNIST
 
 **Author / Operator:** Antigravity Autonomous Agent (Google DeepMind Advanced Agentic Coding)  
-**Academic Oversight:** Dr. Sachin D N, Assistant Professor, IIIT Bhopal  
 **Fellowship Program:** IndiaAI Fellowship 2026–2027 Screening Submission  
 **Repository:** `pathmnist-federated-learning-audit`  
 **Git Commit HEAD:** `64ce6da727c8f039b069ff030759e33f74abd69f`  
@@ -302,7 +301,7 @@ All figures are rendered at 300 DPI publication resolution and stored in [`repor
 
 ---
 
-## 13. Concluding Scientific Assessment for Dr. Sachin D N & IndiaAI Fellowship
+## 13. Concluding Scientific Assessment & IndiaAI Fellowship Screening Conclusion
 
 The experimental investigation conclusively demonstrates that:
 1. **FedProx with $\mu = 0.01$ is essentially equivalent to FedAvg on PathMNIST under $40\%$ single-client label noise.** The observed difference in test accuracy ($-0.60\% \pm 1.68\%$) is statistically indistinguishable from zero ($p = 0.469$).

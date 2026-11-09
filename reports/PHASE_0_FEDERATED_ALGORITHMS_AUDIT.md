@@ -1,7 +1,6 @@
 # PHASE 0: FEDERATED ALGORITHMS AUDIT (FedAvg vs. FedProx) (REVISED)
 
 **Project:** Federated Learning on PathMNIST (FedAvg vs. FedProx)  
-**Research Supervision:** Dr. Sachin D N, Assistant Professor, Dept. of CSE, IIIT Bhopal  
 **Fellowship Program:** IndiaAI Fellowship 2026–27 Screening Submission  
 **Target Codebase:** `third_party/PFLlib`  
 **Audit Status:** Technical Correction & Research Validation Completed  

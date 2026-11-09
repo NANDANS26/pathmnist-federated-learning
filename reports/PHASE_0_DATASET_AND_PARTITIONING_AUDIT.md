@@ -1,7 +1,6 @@
 # PHASE 0: DATASET AND PARTITIONING TECHNICAL AUDIT (CORRECTED)
 
 **Project:** Federated Learning on PathMNIST (FedAvg vs. FedProx)  
-**Research Supervision:** Dr. Sachin D N, Assistant Professor, Dept. of CSE, IIIT Bhopal  
 **Fellowship Program:** IndiaAI Fellowship 2026–27 Screening Submission  
 **Target Codebase:** `third_party/PFLlib` (`dataset/generate_MNIST.py`, `dataset/utils/dataset_utils.py`, `system/utils/data_utils.py`)  
 **Audit Status:** Technical Correction Completed  
@@ -101,7 +100,7 @@ PFLlib implements Dirichlet non-IID partitioning in `dataset/utils/dataset_utils
 ```
 
 ### 4.1 Rejection Sampling and Distribution Truncation `[INFERRED]`
-- Dr. Sachin D N specified Dirichlet non-IID partitioning with $\alpha = 0.3$, without introducing arbitrary client-size floors.
+- The research protocol specified Dirichlet non-IID partitioning with $\alpha = 0.3$, without introducing arbitrary client-size floors.
 - Enforcing an artificial floor (such as $\ge 1,000$ samples) via rejection sampling truncates the tails of the Dirichlet distribution $\text{Dir}(\alpha=0.3)$, artificially dampening client heterogeneity.
 - **Adopted Strategy `[PROPOSED]`:**
   1. Generate an unconstrained Dirichlet partition with $N=5$ clients and $\alpha=0.3$ using an explicit deterministic seed (`seed=42`).

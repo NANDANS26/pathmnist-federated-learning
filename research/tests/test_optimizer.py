@@ -1,6 +1,5 @@
 """
 Unit tests for PerturbedSGD Optimizer (FedProx).
-Supervised by Dr. Sachin D N, IIIT Bhopal.
 """
 
 import pytest

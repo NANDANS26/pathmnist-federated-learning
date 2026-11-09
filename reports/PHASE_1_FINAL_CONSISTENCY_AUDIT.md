@@ -1,7 +1,6 @@
 # PHASE 1 FINAL TECHNICAL CONSISTENCY AUDIT REPORT
 
 **Project:** Comparative Experimental Analysis of Federated Averaging (FedAvg) and Federated Proximal (FedProx) on Non-IID PathMNIST with 40% Client-Specific Label Noise  
-**Supervision:** Dr. Sachin D N, Assistant Professor, Department of Computer Science and Engineering, IIIT Bhopal  
 **Fellowship Target:** IndiaAI Fellowship 2026–27 (Technical Screening Submission)  
 **Author:** Senior Federated Learning Systems Architect & Quality Assurance Auditor  
 **Audit Phase:** Final Pre-Implementation Consistency Verification (`Phase 1 Closeout`)  

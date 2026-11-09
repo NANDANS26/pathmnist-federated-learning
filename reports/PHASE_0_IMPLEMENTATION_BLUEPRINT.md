@@ -1,7 +1,6 @@
 # PHASE 0: RESEARCH IMPLEMENTATION BLUEPRINT (REVISED)
 
 **Project:** Comparative Experimental Analysis of FedAvg and FedProx on Non-IID PathMNIST with Label Noise  
-**Research Supervision:** Dr. Sachin D N, Assistant Professor, Department of Computer Science and Engineering, IIIT Bhopal  
 **Fellowship Program:** IndiaAI Fellowship 2026–27 (Technical Screening Submission)  
 **Author:** Senior ML Systems Engineer & Federated Learning Researcher  
 **Target Environment:** Windows 10, Intel Pentium G3240 (2-Core CPU), 4 GB RAM  
@@ -84,7 +83,7 @@ pathmnist-federated-learning/
 │   ├── checkpoints/          # Model checkpoints (best and final)
 │   └── figures/              # Publication-ready plots (PDF / PNG)
 │
-├── documentation/            # Extended research notes, mentor briefs, slides
+├── documentation/            # Extended research notes, research briefs, slides
 │
 ├── requirements.txt          # Minimal CPU-only dependencies
 └── README.md                 # Project presentation, results summary, instructions
@@ -174,4 +173,4 @@ To guarantee stable execution on the target Windows system:
   3. Client Update $L_2$ Norm Trajectories over rounds.
   4. Pairwise Cosine Similarity Heatmaps and Trajectories (Clean vs. Clean and Clean vs. Noisy).
 - Generate final research submission report and comprehensive GitHub `README.md`.
-- **Acceptance Gate:** Submission package complete, reproducible, and compliant with all screening guidelines under Dr. Sachin D N's supervision.
+- **Acceptance Gate:** Submission package complete, reproducible, and compliant with all screening guidelines for the IndiaAI Fellowship screening submission.

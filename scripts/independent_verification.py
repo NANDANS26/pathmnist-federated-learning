@@ -3,7 +3,6 @@ Phase 4 Independent Forensic Verification and Metric Reconstruction Script.
 Independently verifies and reconstructs all validation and held-out test metrics,
 computes confusion matrices, macro-F1, balanced accuracy, per-class metrics,
 and saves per-sample test predictions.
-Supervised by Dr. Sachin D N, IIIT Bhopal.
 """
 
 import sys

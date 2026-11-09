@@ -1,6 +1,5 @@
 """
 Exact FedProx Proximal SGD Optimizer (Perturbed SGD).
-Supervised by Dr. Sachin D N, IIIT Bhopal.
 """
 
 import torch

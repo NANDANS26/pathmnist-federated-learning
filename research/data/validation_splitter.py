@@ -1,6 +1,5 @@
 """
 Validation Shard Apportionment via Hamilton-Hare Largest Remainder Method.
-Supervised by Dr. Sachin D N, IIIT Bhopal.
 """
 
 import json

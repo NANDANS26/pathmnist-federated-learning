@@ -6,7 +6,6 @@
 **Inspected Attempts:** `experiments/configs/` (Phase 6B), `experiments/seed_42_attempt_2/` (Phase 6C), `experiments/seed_42_attempt_3/` (Phase 6D)  
 **Date:** November 8, 2026  
 **Auditor:** Antigravity Research Infrastructure Agent  
-**Academic Supervision:** Dr. Sachin D N, Assistant Professor, Department of CSE, IIIT Bhopal  
 **Audit Verdict:** **READY FOR MULTI-SEED EXECUTION**
 
 ---

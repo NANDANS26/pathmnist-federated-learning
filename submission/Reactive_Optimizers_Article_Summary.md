@@ -1,12 +1,11 @@
 # Literature Summary & Critical Analysis: "Reactive Optimizers"
 
-**Document Classification:** Research Preprint (arXiv:2610.33826, October 2026)  
-*(Note: This is an unrefereed arXiv preprint; it has not undergone formal peer review at a journal or conference).*  
-**Primary Source:** *Reactive Optimizers*  
-**Authors:** Xingjian Bai, Jia-Hao Liang, Jayden Teoh, Vincent Sitzmann (Massachusetts Institute of Technology)  
-**URL:** [https://arxiv.org/abs/2610.33826](https://arxiv.org/abs/2610.33826)  
-**Evaluator:** Nandan S (IndiaAI Fellowship 2026–2027 Screening Submission)  
-**Faculty Mentor:** Dr. Sachin D N, IIIT Bhopal  
+**Document Classification:** Research Preprint (arXiv:2610.33826, October 2026)
+*(Note: This is an unrefereed arXiv preprint; it has not undergone formal peer review at a journal or conference).*
+**Primary Source:** *Reactive Optimizers*
+**Authors:** Xingjian Bai, Jia-Hao Liang, Jayden Teoh, Vincent Sitzmann (Massachusetts Institute of Technology)
+**URL:** [https://arxiv.org/abs/2610.33826](https://arxiv.org/abs/2610.33826)
+**Evaluator:** Nandan S (IndiaAI Fellowship 2026–2027 Screening Submission)
 
 ---
 

@@ -5,10 +5,10 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![IndiaAI Fellowship](https://img.shields.io/badge/IndiaAI%20Fellowship-2026--27-orange.svg)](https://indiaai.gov.in/)
 
-**Research Project:** Comparative Experimental Analysis of Federated Averaging (FedAvg) and Federated Proximal Optimization (FedProx) on Non-IID PathMNIST with 40% Symmetric Label Noise  
-**Academic Supervision:** Dr. Sachin D N, Assistant Professor, Department of Computer Science & Engineering, IIIT Bhopal  
-**Fellowship Track:** IndiaAI Fellowship 2026–2027 (Research Screening Submission)  
-**Primary Repository:** [https://github.com/NANDANS26/pathmnist-federated-learning](https://github.com/NANDANS26/pathmnist-federated-learning)  
+**Research Project:** Comparative Experimental Analysis of Federated Averaging (FedAvg) and Federated Proximal Optimization (FedProx) on Non-IID PathMNIST with 40% Symmetric Label Noise
+**Author:** Nandan S
+**Fellowship Track:** IndiaAI Fellowship 2026–2027 (Research Screening Submission)
+**Primary Repository:** [https://github.com/NANDANS26/pathmnist-federated-learning](https://github.com/NANDANS26/pathmnist-federated-learning)
 
 ---
 

@@ -1,7 +1,6 @@
 """
 FedAvg Experiment Runner.
 Executes Federated Averaging training across rounds with telemetry logging and checkpoint saving.
-Supervised by Dr. Sachin D N, IIIT Bhopal.
 """
 
 import os

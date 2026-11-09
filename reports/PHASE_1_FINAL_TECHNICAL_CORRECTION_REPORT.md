@@ -1,7 +1,6 @@
 # PHASE 1 FINAL TECHNICAL CORRECTION & RESEARCH VALIDATION REPORT
 
 **Project:** Comparative Experimental Analysis of Federated Averaging (FedAvg) and Federated Proximal (FedProx) on Non-IID PathMNIST with 40% Client-Specific Label Noise  
-**Supervision:** Dr. Sachin D N, Assistant Professor, Department of Computer Science and Engineering, IIIT Bhopal  
 **Fellowship Target:** IndiaAI Fellowship 2026–27 (Technical Screening Submission)  
 **Author:** Senior Federated Learning Research Scientist & PyTorch Systems Architect  
 **Review Status:** Formal Technical Review & Correction Completed  
@@ -182,7 +181,7 @@ ELSE IF (35 seconds <= T_round <= 75 seconds):
 ELSE IF (75 seconds < T_round <= 120 seconds):
     Target Communication Horizon R = 30 rounds (37.5 to 60 min runtime)
 ELSE (T_round > 120 seconds):
-    HALT execution immediately and consult research mentor Dr. Sachin D N
+    HALT execution immediately and review experiment configuration
 ```
 **Emergency Safety Threshold:** If system available physical memory drops below **150 MB** at any point, the experiment terminates immediately with an emergency state dump to prevent OS kernel paging lockup.
 

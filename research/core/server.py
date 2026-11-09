@@ -1,7 +1,6 @@
 """
 Federated Server and Orchestration Engine.
 Handles sample-weighted aggregation, update diagnostics extraction, and clean validation evaluation.
-Supervised by Dr. Sachin D N, IIIT Bhopal.
 """
 
 import time

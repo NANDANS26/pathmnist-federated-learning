@@ -1,6 +1,6 @@
 {
   "study": "IndiaAI Fellowship 2026-27 Screening Submission",
-  "mentor": "Dr. Sachin D N, IIIT Bhopal",
+  "author": "Nandan S",
   "seed": 42,
   "git_commit_hash": "64ce6da727c8f039b069ff030759e33f74abd69f",
   "model_architecture": "CompactPathCNN",

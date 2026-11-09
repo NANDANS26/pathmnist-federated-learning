@@ -3,7 +3,6 @@ Multi-Seed Experiment Runner and Orchestration Engine for Federated Learning.
 Supports deterministic multi-seed runs (e.g., seeds 42, 123, 2026, 3407, 7777).
 Generates isolated partition manifests, noise manifests, initial checkpoints,
 and immutable run metadata per seed.
-Supervised by Dr. Sachin D N, IIIT Bhopal.
 """
 
 import sys
@@ -322,7 +321,7 @@ def execute_seed_experiment(seed: int, num_rounds: int = 30, attempt: int = 1, f
     iso_end_time = datetime.datetime.now(datetime.timezone.utc).isoformat()
     seed_metadata = {
         "study": "IndiaAI Fellowship 2026-27 Screening Submission",
-        "mentor": "Dr. Sachin D N, IIIT Bhopal",
+        "author": "Nandan S",
         "seed": seed,
         "git_commit_hash": git_hash,
         "model_architecture": "CompactPathCNN",

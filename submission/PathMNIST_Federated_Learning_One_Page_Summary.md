@@ -1,7 +1,7 @@
 # Executive Research Summary: FedAvg vs. FedProx on PathMNIST
-**Research Study:** IndiaAI Fellowship 2026–2027 Screening Submission  
-**Candidate:** Nandan S | **Supervision:** Dr. Sachin D N, Assistant Professor, CSE, IIIT Bhopal  
-**Repository:** [github.com/NANDANS26/pathmnist-federated-learning](https://github.com/NANDANS26/pathmnist-federated-learning)  
+**Research Study:** IndiaAI Fellowship 2026–2027 Screening Submission
+**Candidate:** Nandan S
+**Repository:** [github.com/NANDANS26/pathmnist-federated-learning](https://github.com/NANDANS26/pathmnist-federated-learning)
 
 ---
 

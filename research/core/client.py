@@ -1,7 +1,6 @@
 """
 Federated Client Implementation.
 Executes local training loops for FedAvg and FedProx with deterministic mini-batch shuffling.
-Supervised by Dr. Sachin D N, IIIT Bhopal.
 """
 
 import time

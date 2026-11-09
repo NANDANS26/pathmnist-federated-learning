@@ -1,6 +1,5 @@
 """
 Unit tests for CompactPathCNN Architecture.
-Supervised by Dr. Sachin D N, IIIT Bhopal.
 """
 
 import pytest

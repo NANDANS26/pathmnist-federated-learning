@@ -2,7 +2,6 @@
 ## Finalized Protocols, Empirical Calibration Gates, Dataset Inspection Checkpoints, and Optional Enhancements
 
 **Project:** Comparative Experimental Analysis of FedAvg and FedProx on Non-IID PathMNIST with Client-Specific Label Noise  
-**Research Supervision:** Dr. Sachin D N, Assistant Professor, Department of CSE, IIIT Bhopal  
 **Fellowship Program:** IndiaAI Fellowship 2026–27 (Technical Screening Submission)  
 **Author:** Senior Federated Learning Research Scientist & Quality Assurance Auditor  
 **Document Status:** Decision Log and Open Questions (`Phase 1`)  
@@ -16,7 +15,7 @@ To prevent scope creep, unverified claims, and methodological regressions, decis
 1. **Decisions Finalized in Phase 1:** Fixed design specifications that are mathematically and experimentally frozen.
 2. **Decisions Requiring CPU Pilot Measurement:** Parameters calibrated empirically during the Phase 2 pilot test.
 3. **Decisions Requiring Dataset Inspection:** Structural observations conducted upon downloading PathMNIST in Phase 2.
-4. **Decisions Requiring Mentor Clarification:** Potential areas for guidance from Dr. Sachin D N.
+4. **Decisions Requiring Protocol Clarification:** Potential areas for methodology refinement.
 5. **Optional Enhancements:** Non-mandatory explorations that must not obstruct core deliverables.
 
 ---
@@ -62,7 +61,7 @@ $$\text{Decision}(T_{\text{round}}) = \begin{cases}
 R = 100 \text{ rounds} & \text{if } T_{\text{round}} < 35 \text{ s} \quad (\text{Estimated total duration } < 60 \text{ min}) \\
 R = 50 \text{ rounds} & \text{if } 35 \text{ s} \le T_{\text{round}} \le 75 \text{ s} \quad (\text{Estimated total duration } \approx 30\text{--}65 \text{ min}) \\
 R = 30 \text{ rounds} & \text{if } 75 \text{ s} < T_{\text{round}} \le 120 \text{ s} \quad (\text{Estimated total duration } \approx 38\text{--}60 \text{ min}) \\
-\text{Halt \& Review} & \text{if } T_{\text{round}} > 120 \text{ s} \quad (\text{Flag for mentor review; consider } E=1)
+\text{Halt \& Review} & \text{if } T_{\text{round}} > 120 \text{ s} \quad (\text{Flag for protocol review; consider } E=1)
 \end{cases}$$
 
 - Both algorithms will receive the identical calibrated number of communication rounds.
@@ -84,16 +83,16 @@ These observations will be conducted immediately upon downloading PathMNIST in P
 
 ---
 
-## 5. Category 4: Decisions for Technical Mentor Guidance (Dr. Sachin D N)
+## 5. Category 4: Decisions for Protocol Refinement
 
-These design aspects are well-defined by default, but remain open for mentor input:
+These design aspects are well-defined by default, but remain open for reviewer input:
 
 1. **Ablation Matrix Prioritization:**
    - *Default Plan:* Complete primary mandatory runs (FedAvg baseline and FedProx $\mu=0.01$). If CPU runtime permits, execute sensitivity runs $\mu=0.001$ and $\mu=0.1$.
-   - *Mentor Clarification:* Confirm whether the mentor prefers exploring different $\mu$ values (0.001, 0.1) or local epoch variations ($E=1$ vs $E=2$).
+   - *Protocol Clarification:* Confirm whether to explore exploring different $\mu$ values (0.001, 0.1) or local epoch variations ($E=1$ vs $E=2$).
 2. **Per-Client Validation Shard Structure:**
    - *Default Plan:* Validation set (10,004) is partitioned into 5 clean client-specific validation shards representative of each client's training class distribution, while also reporting global pooled validation.
-   - *Mentor Clarification:* Confirm that reporting both pooled global validation accuracy and per-client validation accuracy satisfies the screening requirements.
+   - *Protocol Clarification:* Confirm that reporting both pooled global validation accuracy and per-client validation accuracy satisfies the screening requirements.
 
 ---
 

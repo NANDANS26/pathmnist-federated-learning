@@ -2,7 +2,6 @@
 ## Exploratory Empirical Comparison of Federated Averaging (FedAvg) and Federated Proximal (FedProx) on Non-IID PathMNIST with 40% Client-Specific Label Noise
 
 **Project:** Comparative Experimental Analysis of FedAvg and FedProx on Non-IID PathMNIST with Client-Specific Label Noise  
-**Research Supervision:** Dr. Sachin D N, Assistant Professor, Department of Computer Science and Engineering, IIIT Bhopal  
 **Fellowship Program:** IndiaAI Fellowship 2026–27 (Technical Screening Submission)  
 **Author:** Senior Federated Learning Research Scientist & ML Systems Architect  
 **Document Status:** Formal Research Protocol (`Phase 1`)  

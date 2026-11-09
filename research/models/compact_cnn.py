@@ -1,7 +1,6 @@
 """
 CompactPathCNN Architecture and Canonical State Hashing.
 Phase 2 Implementation for IndiaAI Fellowship Screening.
-Supervised by Dr. Sachin D N, IIIT Bhopal.
 """
 
 import hashlib

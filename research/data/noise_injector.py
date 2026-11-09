@@ -1,6 +1,5 @@
 """
 Exact 40% Symmetric Label Noise Injection for Client 5.
-Supervised by Dr. Sachin D N, IIIT Bhopal.
 """
 
 import json

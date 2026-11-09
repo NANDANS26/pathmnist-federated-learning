@@ -1,7 +1,6 @@
 # ==============================================================================
 # PHASE 1 EXPERIMENTAL PROTOCOL SPECIFICATION (CORRECTED)
 # Comparative Analysis: FedAvg vs FedProx on PathMNIST with 40% Label Noise
-# Research Mentor: Dr. Sachin D N, Dept of CSE, IIIT Bhopal
 # Fellowship Target: IndiaAI Fellowship 2026-27 (Screening Submission)
 # ==============================================================================
 
@@ -159,7 +158,7 @@ provisional_parameters_requiring_pilot_calibration:
     condition_fast: "T_round < 35s -> R = 100 rounds (~58 min max)"
     condition_nominal: "35s <= T_round <= 75s -> R = 50 rounds (29 to 62.5 min)"
     condition_slow: "75s < T_round <= 120s -> R = 30 rounds (37.5 to 60 min)"
-    condition_unviable: "T_round > 120s -> HALT and review architecture/subsampling with mentor"
+    condition_unviable: "T_round > 120s -> HALT and review architecture/subsampling for review"
   pilot_policy: "Stage A (1-round smoke test), Stage B (2-round latency/memory test)"
 
 evaluation_and_metrics:

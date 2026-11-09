@@ -1,7 +1,6 @@
 # PHASE 0: RESOURCE FEASIBILITY & HARDWARE AUDIT REPORT (CORRECTED)
 
 **Project:** Federated Learning on PathMNIST (FedAvg vs. FedProx)  
-**Research Supervision:** Dr. Sachin D N, Assistant Professor, Dept. of CSE, IIIT Bhopal  
 **Fellowship Program:** IndiaAI Fellowship 2026–27 Screening Submission  
 **Execution Environment:** Windows 10 Host System  
 **Audit Status:** Technical Correction Completed  

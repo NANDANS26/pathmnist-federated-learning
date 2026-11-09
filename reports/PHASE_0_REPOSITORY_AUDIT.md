@@ -1,7 +1,6 @@
 # PHASE 0: PFLlib REPOSITORY TECHNICAL AUDIT REPORT (REVISED)
 
 **Project:** Federated Learning on PathMNIST (FedAvg vs. FedProx)  
-**Research Supervision:** Dr. Sachin D N, Assistant Professor, Dept. of CSE, IIIT Bhopal  
 **Fellowship Program:** IndiaAI Fellowship 2026–27 Screening Submission  
 **Audit Author:** Senior ML Systems Engineer & Federated Learning Technical Auditor  
 **Audit Status:** Technical Correction & Research Validation Completed  

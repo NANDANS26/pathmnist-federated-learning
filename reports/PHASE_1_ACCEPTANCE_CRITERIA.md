@@ -2,7 +2,6 @@
 ## Objective Verification Gates and Acceptance Criteria for Implementation and Experimental Phases
 
 **Project:** Comparative Experimental Analysis of FedAvg and FedProx on Non-IID PathMNIST with Client-Specific Label Noise  
-**Research Supervision:** Dr. Sachin D N, Assistant Professor, Department of CSE, IIIT Bhopal  
 **Fellowship Program:** IndiaAI Fellowship 2026–27 (Technical Screening Submission)  
 **Author:** Senior Federated Learning Research Scientist & Quality Assurance Auditor  
 **Document Status:** Formal Quality Gate Specifications (`Phase 1`)  

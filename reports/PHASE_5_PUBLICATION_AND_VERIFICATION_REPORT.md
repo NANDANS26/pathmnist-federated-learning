@@ -1,7 +1,6 @@
 # Phase 5: Publication, Verification & Integrity Reconciliation Report
 
 **Project:** Comparative Experimental Analysis of Federated Averaging (FedAvg) and Federated Proximal (FedProx, $\mu = 0.01$) on Non-IID PathMNIST with 40% Client-Specific Label Noise  
-**Academic Supervision:** Dr. Sachin D N, Assistant Professor, Department of CSE, IIIT Bhopal  
 **Fellowship Programme:** IndiaAI Fellowship 2026–27 (Research Screening Submission)  
 **Repository:** [https://github.com/NANDANS26/pathmnist-federated-learning](https://github.com/NANDANS26/pathmnist-federated-learning)  
 **Pushed Base Commit SHA:** `dd7b810130a7dcda1d4487ce1b5d877bf4b4575b` (short: `dd7b810`)

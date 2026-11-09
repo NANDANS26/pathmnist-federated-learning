@@ -1,6 +1,5 @@
 """
 Unit tests for Official PathMNIST Split Preservation and Zero-Leakage Verification.
-Supervised by Dr. Sachin D N, IIIT Bhopal.
 """
 
 import pytest

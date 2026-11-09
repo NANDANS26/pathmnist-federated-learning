@@ -67,11 +67,10 @@ def main():
 
     report_md_content = """# Empirical Evaluation of Federated Averaging and Federated Proximal Optimization under Non-IID Partitioning and Symmetric Label Noise on PathMNIST
 
-**Author:** Nandan S  
-**Academic Supervision:** Dr. Sachin D N, Assistant Professor, Department of Computer Science & Engineering, IIIT Bhopal  
-**Submission Track:** IndiaAI Fellowship 2026–2027 Screening  
-**Repository:** [github.com/NANDANS26/pathmnist-federated-learning](https://github.com/NANDANS26/pathmnist-federated-learning)  
-**Date of Completion:** November 9, 2026  
+**Author:** Nandan S
+**Submission Track:** IndiaAI Fellowship 2026–2027 Screening
+**Repository:** [github.com/NANDANS26/pathmnist-federated-learning](https://github.com/NANDANS26/pathmnist-federated-learning)
+**Date of Completion:** November 9, 2026
 
 ---
 
@@ -216,27 +215,27 @@ Per-class F1 metrics were calculated as the unweighted arithmetic mean across th
 ## 5. Visual Deliverables & Graphical Analysis
 
 ### Figure 1: Test Accuracy Comparison Across All 5 Seeds
-![FIG-P7-01 Test Accuracy](figures/FIG-P7-01_test_accuracy_comparison.png)  
+![FIG-P7-01 Test Accuracy](figures/FIG-P7-01_test_accuracy_comparison.png)
 *Figure 1: Grouped bar chart comparing held-out test accuracy across all five random seeds, with paired difference callouts in percentage points.*
 
 ### Figure 2: Test Macro-F1 Comparison Across All 5 Seeds
-![FIG-P7-02 Macro-F1](figures/FIG-P7-02_macro_f1_comparison.png)  
+![FIG-P7-02 Macro-F1](figures/FIG-P7-02_macro_f1_comparison.png)
 *Figure 2: Grouped bar chart of test Macro-F1 scores across all five seeds.*
 
 ### Figure 3: Test Balanced Accuracy Comparison Across All 5 Seeds
-![FIG-P7-03 Balanced Accuracy](figures/FIG-P7-03_balanced_accuracy_comparison.png)  
+![FIG-P7-03 Balanced Accuracy](figures/FIG-P7-03_balanced_accuracy_comparison.png)
 *Figure 3: Grouped bar chart of test Balanced Accuracy across all five seeds.*
 
 ### Figure 4: Validation Learning Curves Across 30 Communication Rounds
-![FIG-P7-04 Learning Curves](figures/FIG-P7-04_validation_learning_curves.png)  
+![FIG-P7-04 Learning Curves](figures/FIG-P7-04_validation_learning_curves.png)
 *Figure 4: Global validation accuracy convergence trajectories for all five seeds and the 5-seed aggregate mean curve with $\\pm 1$ sample standard deviation bands.*
 
 ### Figure 5: Aggregate Benchmark Metrics (Mean $\\pm$ 1 Sample Standard Deviation)
-![FIG-P7-05 Aggregate Metrics](figures/FIG-P7-05_aggregate_metrics_mean_std.png)  
+![FIG-P7-05 Aggregate Metrics](figures/FIG-P7-05_aggregate_metrics_mean_std.png)
 *Figure 5: Benchmark summary comparing FedAvg and FedProx across key performance indicators with exact sample standard deviation error bars (ddof=1).*
 
 ### Figure 6: Per-Class Generalization Comparison Across 9 Tissue Classes
-![FIG-P7-06 Per-Class F1](figures/FIG-P7-06_per_class_f1_comparison.png)  
+![FIG-P7-06 Per-Class F1](figures/FIG-P7-06_per_class_f1_comparison.png)
 *Figure 6: Per-class F1 score comparison across the 9 PathMNIST histopathology tissue types.*
 
 ---
@@ -379,7 +378,7 @@ hr {{ border: none; border-top: 1px solid #cbd5e1; margin: 16px 0; }}
 <body>
 <h1>Empirical Evaluation of Federated Averaging and Federated Proximal Optimization under Non-IID Partitioning and Symmetric Label Noise on PathMNIST</h1>
 <div class="author-block">
-    <strong>Nandan S</strong> &bull; Supervised by <strong>Dr. Sachin D N</strong>, Assistant Professor, CSE, IIIT Bhopal<br>
+    <strong>Nandan S</strong><br>
     IndiaAI Fellowship 2026–2027 Screening Submission &bull; Repository: <a href="https://github.com/NANDANS26/pathmnist-federated-learning">github.com/NANDANS26/pathmnist-federated-learning</a> &bull; November 9, 2026
 </div>
 
@@ -495,9 +494,9 @@ hr {{ border: none; border-top: 1px solid #cbd5e1; margin: 16px 0; }}
     summary_html_temp = os.path.join(SUBMISSION_DIR, "_temp_summary.html")
 
     summary_md_content = """# Executive Research Summary: FedAvg vs. FedProx on PathMNIST
-**Research Study:** IndiaAI Fellowship 2026–2027 Screening Submission  
-**Candidate:** Nandan S | **Supervision:** Dr. Sachin D N, Assistant Professor, CSE, IIIT Bhopal  
-**Repository:** [github.com/NANDANS26/pathmnist-federated-learning](https://github.com/NANDANS26/pathmnist-federated-learning)  
+**Research Study:** IndiaAI Fellowship 2026–2027 Screening Submission
+**Candidate:** Nandan S
+**Repository:** [github.com/NANDANS26/pathmnist-federated-learning](https://github.com/NANDANS26/pathmnist-federated-learning)
 
 ---
 
@@ -659,7 +658,7 @@ li {
 <div class="header">
     <div>
         <div class="title">FedAvg vs. FedProx on PathMNIST: 5-Seed Empirical Benchmark</div>
-        <div class="subtitle">Candidate: <strong>Nandan S</strong> &bull; Mentor: <strong>Dr. Sachin D N</strong> (Assistant Professor, CSE, IIIT Bhopal)</div>
+        <div class="subtitle">Candidate: <strong>Nandan S</strong></div>
     </div>
     <div class="badge-bar">
         IndiaAI Fellowship 2026–2027<br>
@@ -728,9 +727,9 @@ li {
 </table>
 
 <div class="callout-warn">
-    <strong>Statistical Inference (df = 4):</strong> 
-    Test Accuracy paired t(4) = -0.7983, <strong>p = 0.46938</strong> (95% CI: [-2.69 pp, +1.49 pp]; Wilcoxon p = 1.000). 
-    Macro-F1 paired t(4) = -1.5908, <strong>p = 0.18686</strong> (95% CI: [-0.0205, +0.0056]). 
+    <strong>Statistical Inference (df = 4):</strong>
+    Test Accuracy paired t(4) = -0.7983, <strong>p = 0.46938</strong> (95% CI: [-2.69 pp, +1.49 pp]; Wilcoxon p = 1.000).
+    Macro-F1 paired t(4) = -1.5908, <strong>p = 0.18686</strong> (95% CI: [-0.0205, +0.0056]).
     <em>Interpretation:</em> <strong>No statistically significant difference in test performance was detected between FedAvg and FedProx across the five evaluated seeds.</strong> Because five seeds provide limited statistical power and no equivalence testing was conducted, this does not establish statistical equivalence.
 </div>
 
@@ -769,13 +768,12 @@ li {
     ro_sum_path = os.path.join(SUBMISSION_DIR, "Reactive_Optimizers_Article_Summary.md")
     ro_sum_content = """# Literature Summary & Critical Analysis: "Reactive Optimizers"
 
-**Document Classification:** Research Preprint (arXiv:2610.33826, October 2026)  
-*(Note: This is an unrefereed arXiv preprint; it has not undergone formal peer review at a journal or conference).*  
-**Primary Source:** *Reactive Optimizers*  
-**Authors:** Xingjian Bai, Jia-Hao Liang, Jayden Teoh, Vincent Sitzmann (Massachusetts Institute of Technology)  
-**URL:** [https://arxiv.org/abs/2610.33826](https://arxiv.org/abs/2610.33826)  
-**Evaluator:** Nandan S (IndiaAI Fellowship 2026–2027 Screening Submission)  
-**Faculty Mentor:** Dr. Sachin D N, IIIT Bhopal  
+**Document Classification:** Research Preprint (arXiv:2610.33826, October 2026)
+*(Note: This is an unrefereed arXiv preprint; it has not undergone formal peer review at a journal or conference).*
+**Primary Source:** *Reactive Optimizers*
+**Authors:** Xingjian Bai, Jia-Hao Liang, Jayden Teoh, Vincent Sitzmann (Massachusetts Institute of Technology)
+**URL:** [https://arxiv.org/abs/2610.33826](https://arxiv.org/abs/2610.33826)
+**Evaluator:** Nandan S (IndiaAI Fellowship 2026–2027 Screening Submission)
 
 ---
 
@@ -856,10 +854,9 @@ It is essential to distinguish the scope and methodology of Bai et al. from our 
     ro_req_path = os.path.join(SUBMISSION_DIR, "REACTIVE_OPTIMIZERS_SOURCE_REQUIRED.md")
     ro_req_content = """# Reactive Optimizers: Source Requirement Notice
 
-**Fellowship Candidate:** Nandan S  
-**Academic Supervision:** Dr. Sachin D N, IIIT Bhopal  
-**Submission:** IndiaAI Fellowship 2026–2027 Screening  
-**Date:** November 9, 2026  
+**Fellowship Candidate:** Nandan S
+**Submission:** IndiaAI Fellowship 2026–2027 Screening
+**Date:** November 9, 2026
 
 ---
 
@@ -888,12 +885,11 @@ In accordance with Phase 8 Non-Negotiable Constraint #0 (*"Do not fabricate miss
     p81_rep_path = os.path.join(SUBMISSION_DIR, "PHASE_8_FINAL_RELEASE_REPORT.md")
     p81_content = """# Phase 8.2 — Final Scientific Consistency & Release Report
 
-**Author / Operator:** Antigravity Autonomous Agent (Google DeepMind Advanced Agentic Coding)  
-**Academic Oversight:** Dr. Sachin D N, Assistant Professor, IIIT Bhopal  
-**Fellowship Program:** IndiaAI Fellowship 2026–2027 Screening Submission  
-**Repository:** `pathmnist-federated-learning-audit`  
-**Remote URL:** [https://github.com/NANDANS26/pathmnist-federated-learning.git](https://github.com/NANDANS26/pathmnist-federated-learning.git)  
-**Date of Completion:** November 9, 2026  
+**Author / Operator:** Antigravity Autonomous Agent (Google DeepMind Advanced Agentic Coding)
+**Fellowship Program:** IndiaAI Fellowship 2026–2027 Screening Submission
+**Repository:** `pathmnist-federated-learning-audit`
+**Remote URL:** [https://github.com/NANDANS26/pathmnist-federated-learning.git](https://github.com/NANDANS26/pathmnist-federated-learning.git)
+**Date of Completion:** November 9, 2026
 
 ---
 

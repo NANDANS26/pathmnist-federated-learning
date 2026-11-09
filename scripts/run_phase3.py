@@ -2,7 +2,6 @@
 Phase 3 Master Experiment Runner: Full Federated Learning Experiments.
 Executes Primary Run 1 (FedAvg) and Primary Run 2 (FedProx, mu=0.01) on non-IID PathMNIST with 40% label noise on Client 5.
 Evaluates final held-out test split, generates FIG-01 to FIG-07, and produces final comparison artifacts.
-Supervised by Dr. Sachin D N, IIIT Bhopal.
 """
 
 import sys

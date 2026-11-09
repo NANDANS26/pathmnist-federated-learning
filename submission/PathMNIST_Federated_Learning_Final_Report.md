@@ -1,10 +1,9 @@
 # Empirical Evaluation of Federated Averaging and Federated Proximal Optimization under Non-IID Partitioning and Symmetric Label Noise on PathMNIST
 
-**Author:** Nandan S  
-**Academic Supervision:** Dr. Sachin D N, Assistant Professor, Department of Computer Science & Engineering, IIIT Bhopal  
-**Submission Track:** IndiaAI Fellowship 2026–2027 Screening  
-**Repository:** [github.com/NANDANS26/pathmnist-federated-learning](https://github.com/NANDANS26/pathmnist-federated-learning)  
-**Date of Completion:** November 9, 2026  
+**Author:** Nandan S
+**Submission Track:** IndiaAI Fellowship 2026–2027 Screening
+**Repository:** [github.com/NANDANS26/pathmnist-federated-learning](https://github.com/NANDANS26/pathmnist-federated-learning)
+**Date of Completion:** November 9, 2026
 
 ---
 
@@ -149,27 +148,27 @@ Per-class F1 metrics were calculated as the unweighted arithmetic mean across th
 ## 5. Visual Deliverables & Graphical Analysis
 
 ### Figure 1: Test Accuracy Comparison Across All 5 Seeds
-![FIG-P7-01 Test Accuracy](figures/FIG-P7-01_test_accuracy_comparison.png)  
+![FIG-P7-01 Test Accuracy](figures/FIG-P7-01_test_accuracy_comparison.png)
 *Figure 1: Grouped bar chart comparing held-out test accuracy across all five random seeds, with paired difference callouts in percentage points.*
 
 ### Figure 2: Test Macro-F1 Comparison Across All 5 Seeds
-![FIG-P7-02 Macro-F1](figures/FIG-P7-02_macro_f1_comparison.png)  
+![FIG-P7-02 Macro-F1](figures/FIG-P7-02_macro_f1_comparison.png)
 *Figure 2: Grouped bar chart of test Macro-F1 scores across all five seeds.*
 
 ### Figure 3: Test Balanced Accuracy Comparison Across All 5 Seeds
-![FIG-P7-03 Balanced Accuracy](figures/FIG-P7-03_balanced_accuracy_comparison.png)  
+![FIG-P7-03 Balanced Accuracy](figures/FIG-P7-03_balanced_accuracy_comparison.png)
 *Figure 3: Grouped bar chart of test Balanced Accuracy across all five seeds.*
 
 ### Figure 4: Validation Learning Curves Across 30 Communication Rounds
-![FIG-P7-04 Learning Curves](figures/FIG-P7-04_validation_learning_curves.png)  
+![FIG-P7-04 Learning Curves](figures/FIG-P7-04_validation_learning_curves.png)
 *Figure 4: Global validation accuracy convergence trajectories for all five seeds and the 5-seed aggregate mean curve with $\pm 1$ sample standard deviation bands.*
 
 ### Figure 5: Aggregate Benchmark Metrics (Mean $\pm$ 1 Sample Standard Deviation)
-![FIG-P7-05 Aggregate Metrics](figures/FIG-P7-05_aggregate_metrics_mean_std.png)  
+![FIG-P7-05 Aggregate Metrics](figures/FIG-P7-05_aggregate_metrics_mean_std.png)
 *Figure 5: Benchmark summary comparing FedAvg and FedProx across key performance indicators with exact sample standard deviation error bars (ddof=1).*
 
 ### Figure 6: Per-Class Generalization Comparison Across 9 Tissue Classes
-![FIG-P7-06 Per-Class F1](figures/FIG-P7-06_per_class_f1_comparison.png)  
+![FIG-P7-06 Per-Class F1](figures/FIG-P7-06_per_class_f1_comparison.png)
 *Figure 6: Per-class F1 score comparison across the 9 PathMNIST histopathology tissue types.*
 
 ---

@@ -1,7 +1,6 @@
 """
 Durable Local JSONL Logging and CSV Summary Export.
 Phase 2 Implementation for IndiaAI Fellowship Screening.
-Supervised by Dr. Sachin D N, IIIT Bhopal.
 """
 
 import json

@@ -2,7 +2,6 @@
 ## Deterministic Random Seeding, Canonical Model Hashing, Partition Manifests, and Durable Telemetry Protocols
 
 **Project:** Comparative Experimental Analysis of FedAvg and FedProx on Non-IID PathMNIST with Client-Specific Label Noise  
-**Research Supervision:** Dr. Sachin D N, Assistant Professor, Department of Computer Science and Engineering, IIIT Bhopal  
 **Fellowship Program:** IndiaAI Fellowship 2026–27 (Technical Screening Submission)  
 **Author:** Senior Federated Learning Research Scientist & Reproducibility Auditor  
 **Document Status:** Formal Reproducibility Plan (`Phase 1`)  

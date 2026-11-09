@@ -1,7 +1,6 @@
 # PHASE 0: COMPREHENSIVE TECHNICAL RISK REGISTER (CORRECTED)
 
 **Project:** Federated Learning on PathMNIST (FedAvg vs. FedProx)  
-**Research Supervision:** Dr. Sachin D N, Assistant Professor, Dept. of CSE, IIIT Bhopal  
 **Fellowship Program:** IndiaAI Fellowship 2026–27 Screening Submission  
 **Audit Status:** Technical Correction Completed  
 **Date:** November 7, 2026  

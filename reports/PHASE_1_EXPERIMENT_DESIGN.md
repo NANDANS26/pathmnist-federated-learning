@@ -2,7 +2,6 @@
 ## Comprehensive Specifications for Data Partitioning, Noise Injection, Model Architecture, and Execution Protocols
 
 **Project:** Comparative Experimental Analysis of FedAvg and FedProx on Non-IID PathMNIST with Client-Specific Label Noise  
-**Research Supervision:** Dr. Sachin D N, Assistant Professor, Department of Computer Science and Engineering, IIIT Bhopal  
 **Fellowship Program:** IndiaAI Fellowship 2026–27 (Technical Screening Submission)  
 **Author:** Senior Federated Learning Research Scientist & PyTorch Systems Architect  
 **Document Status:** Formal Experiment Design (`Phase 1`)  
@@ -325,7 +324,7 @@ $$\text{Decision}(T_{\text{round}}) = \begin{cases}
 R = 100 \text{ rounds} & \text{if } T_{\text{round}} < 35 \text{ s} \quad (\text{Estimated total duration } < 60 \text{ min}) \\
 R = 50 \text{ rounds} & \text{if } 35 \text{ s} \le T_{\text{round}} \le 75 \text{ s} \quad (\text{Estimated total duration } \approx 30\text{--}65 \text{ min}) \\
 R = 30 \text{ rounds} & \text{if } 75 \text{ s} < T_{\text{round}} \le 120 \text{ s} \quad (\text{Estimated total duration } \approx 38\text{--}60 \text{ min}) \\
-\text{Halt \& Review} & \text{if } T_{\text{round}} > 120 \text{ s} \quad (\text{Flag for mentor review; consider } E=1)
+\text{Halt \& Review} & \text{if } T_{\text{round}} > 120 \text{ s} \quad (\text{Flag for protocol review; consider } E=1)
 \end{cases}$$
 
 ### 8.3 System Memory Pressure Stop Condition `[PROPOSED]`

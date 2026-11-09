@@ -1,7 +1,6 @@
 # PHASE 0: EVALUATION AND DIAGNOSTICS TECHNICAL AUDIT (REVISED)
 
 **Project:** Federated Learning on PathMNIST (FedAvg vs. FedProx)  
-**Research Supervision:** Dr. Sachin D N, Assistant Professor, Dept. of CSE, IIIT Bhopal  
 **Fellowship Program:** IndiaAI Fellowship 2026–27 Screening Submission  
 **Target Codebase:** `third_party/PFLlib` (`system/flcore/servers/serverbase.py`, `system/flcore/clients/clientbase.py`, `system/utils/result_utils.py`)  
 **Audit Status:** Technical Correction & Research Validation Completed  

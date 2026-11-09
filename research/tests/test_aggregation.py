@@ -1,6 +1,5 @@
 """
 Unit tests for Sample-Weighted Aggregation.
-Supervised by Dr. Sachin D N, IIIT Bhopal.
 """
 
 import pytest

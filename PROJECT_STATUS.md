@@ -2,7 +2,6 @@
 
 **Project:** Comparative Experimental Analysis of Federated Averaging (FedAvg) and Federated Proximal (FedProx, $\mu = 0.01$) on Non-IID PathMNIST with 40% Client-Specific Label Noise  
 **Academic Context:** IndiaAI Fellowship 2026–27 Research Screening  
-**Faculty Mentor:** Dr. Sachin D N, Assistant Professor, Department of CSE, IIIT Bhopal  
 **Last Updated:** November 2026  
 **Status:** Architecture Hardened, Legacy Evidence Archived, Ready for Full Multi-Seed Execution  
 

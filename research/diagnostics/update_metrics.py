@@ -1,7 +1,6 @@
 """
 Client Update Diagnostics and Telemetry.
 Calculates L2 norms, pairwise cosine similarities, and alignment metrics.
-Supervised by Dr. Sachin D N, IIIT Bhopal.
 """
 
 import torch

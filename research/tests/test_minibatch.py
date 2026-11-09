@@ -1,7 +1,6 @@
 """
 Unit and regression tests for client mini-batch partitioning, coverage, uniqueness,
 determinism, partial batch handling, and image-label correspondence.
-Supervised by Dr. Sachin D N, IIIT Bhopal.
 """
 
 import numpy as np

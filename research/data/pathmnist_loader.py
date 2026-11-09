@@ -1,7 +1,6 @@
 """
 PathMNIST Dataset Acquisition, Split Preservation, and Memory-Mapped Storage.
 Phase 2 Implementation for IndiaAI Fellowship Screening.
-Supervised by Dr. Sachin D N, IIIT Bhopal.
 """
 
 import os

@@ -1,7 +1,6 @@
 """
 FedProx Experiment Runner.
 Executes Federated Proximal training with mu parameter, telemetry logging, and checkpoint saving.
-Supervised by Dr. Sachin D N, IIIT Bhopal.
 """
 
 import os

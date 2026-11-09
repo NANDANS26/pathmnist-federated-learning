@@ -3,7 +3,6 @@
 
 **Project:** Comparative Experimental Analysis of FedAvg and FedProx on Non-IID PathMNIST with 40% Client-Specific Label Noise  
 **Programme:** IndiaAI Fellowship 2026–27 (Research Screening Submission)  
-**Research Mentor:** Dr. Sachin D N, Assistant Professor, Department of Computer Science and Engineering, IIIT Bhopal  
 **Hardware Platform:** Windows 10 Pro (64-bit), Intel Pentium G3240 @ 3.10 GHz (Haswell 22nm, 2 Cores, 2 Threads), 4 GB Physical RAM, PyTorch CPU-Only  
 **Execution Date:** 2026-11-07  
 **Status:** PHASE 3 COMPLETED — EXPERIMENTAL RUNS, TELEMETRY, TEST EVALUATION & FIGURES FINALIZED  
@@ -243,4 +242,4 @@ dir experiments\figures
 
 ## 13. CONCLUSION & FELLOWSHIP SCREENING SUBMISSION READY
 
-Phase 3 is **100% COMPLETE**. All mandatory experimental runs have executed to completion without data reduction, without test-set tuning, without synthetic fabrication, and without modifying the reference `third_party/PFLlib` framework. Genuine experimental artifacts, full round-level logs, held-out test evaluations, and publication figures have been preserved for formal review by Dr. Sachin D N (IIIT Bhopal).
+Phase 3 is **100% COMPLETE**. All mandatory experimental runs have executed to completion without data reduction, without test-set tuning, without synthetic fabrication, and without modifying the reference `third_party/PFLlib` framework. Genuine experimental artifacts, full round-level logs, held-out test evaluations, and publication figures have been preserved for formal review and screening evaluation.

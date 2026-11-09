@@ -1,11 +1,10 @@
 # PHASE 2 EXECUTION REPORT: FEDERATED LEARNING IMPLEMENTATION & CPU PILOT BENCHMARK
 
-**Project:** Comparative Experimental Analysis of Federated Averaging (FedAvg) and Federated Proximal (FedProx) on Non-IID PathMNIST with 40% Client-Specific Label Noise  
-**Programme:** IndiaAI Fellowship 2026–27 (Research Screening Submission)  
-**Research Mentor:** Dr. Sachin D N, Assistant Professor, Department of Computer Science and Engineering, IIIT Bhopal  
-**Hardware Platform:** Windows 10 Pro (64-bit), Intel Pentium G3240 @ 3.10 GHz (2 Cores, 2 Threads, No AVX2/FMA), 4 GB Physical RAM, CPU Execution  
-**Execution Date:** 2026-11-07  
-**Status:** PHASE 2 COMPLETE — AWAITING MENTOR/USER APPROVAL TO COMMENCE FULL EXPERIMENTS  
+**Project:** Comparative Experimental Analysis of Federated Averaging (FedAvg) and Federated Proximal (FedProx) on Non-IID PathMNIST with 40% Client-Specific Label Noise
+**Programme:** IndiaAI Fellowship 2026–27 (Research Screening Submission)
+**Hardware Platform:** Windows 10 Pro (64-bit), Intel Pentium G3240 @ 3.10 GHz (2 Cores, 2 Threads, No AVX2/FMA), 4 GB Physical RAM, CPU Execution
+**Execution Date:** 2026-11-07
+**Status:** PHASE 2 COMPLETE — AWAITING USER APPROVAL TO COMMENCE FULL EXPERIMENTS
 
 ---
 
@@ -301,7 +300,7 @@ The CPU pilot benchmark (`scripts/run_pilot.py`) executed 2 communication rounds
 | **Client 5 Alignment to Mean Update** | 0.3867 | 0.3398 | Suppressed contribution of noisy client |
 
 > [!IMPORTANT]
-> **Key Preliminary Research Finding:**  
+> **Key Preliminary Research Finding:**
 > The proximal term $\frac{\mu}{2} \|w - w_{\text{global}}\|^2$ in FedProx directly mitigates noisy gradient pull. The average cosine similarity between clean clients and the corrupted Client 5 dropped from **0.2369** in FedAvg down to **0.1789** in FedProx (a **24.5% reduction** in alignment toward the corrupted gradient subspace).
 
 ---
@@ -361,5 +360,5 @@ Phase 2 is **100% COMPLETE**.
 
 As mandated by the IndiaAI screening protocol, the agent will **NOT** automatically launch the full 30-round experiments.
 
-We now await explicit mentor/user instruction to initiate:
+We now await explicit user instruction to initiate:
 - **Phase 3:** Full 30-round comparative execution of FedAvg and FedProx, artifact generation, and final IndiaAI fellowship research report synthesis.

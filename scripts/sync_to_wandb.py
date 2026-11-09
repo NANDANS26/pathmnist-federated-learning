@@ -4,7 +4,6 @@ Supports discovered and specified seed experiments (e.g., seeds 42, 123, 2026, 3
 Replays offline durable JSONL metrics, update norms, cosine similarities,
 and final test evaluation metrics to public W&B runs.
 Records actual run URLs in `experiments/results/wandb_sync_status.json`.
-Supervised by Dr. Sachin D N, IIIT Bhopal.
 """
 
 import sys

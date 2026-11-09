@@ -1,9 +1,8 @@
 # Reactive Optimizers: Source Requirement Notice
 
-**Fellowship Candidate:** Nandan S  
-**Academic Supervision:** Dr. Sachin D N, IIIT Bhopal  
-**Submission:** IndiaAI Fellowship 2026–2027 Screening  
-**Date:** November 9, 2026  
+**Fellowship Candidate:** Nandan S
+**Submission:** IndiaAI Fellowship 2026–2027 Screening
+**Date:** November 9, 2026
 
 ---
 

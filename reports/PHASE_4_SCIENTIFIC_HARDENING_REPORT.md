@@ -10,7 +10,6 @@
 
 **Project:** Comparative Experimental Analysis of Federated Averaging (FedAvg) and Federated Proximal (FedProx) on Non-IID PathMNIST with 40% Client-Specific Label Noise
 **Programme:** IndiaAI Fellowship 2026–27 (Research Screening Submission)
-**Research Mentor:** Dr. Sachin D N, Assistant Professor, Department of Computer Science and Engineering, IIIT Bhopal
 **Hardware Environment:** Windows 10 Pro (64-bit), Intel Pentium G3240 @ 3.10 GHz (Dual-Core, 2 Threads), 4 GB Physical RAM, PyTorch CPU-Only
 **Git Commit Hash:** `b08a76525b93f5baa358275d15bf4a040e49f1d1`
 **Execution Date:** 2026-11-07

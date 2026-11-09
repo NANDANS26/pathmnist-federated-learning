@@ -2,7 +2,6 @@
 ## Mathematical Formulations, Aggregation Rules, Telemetry Schemas, and Visualization Specifications
 
 **Project:** Comparative Experimental Analysis of FedAvg and FedProx on Non-IID PathMNIST with Client-Specific Label Noise  
-**Research Supervision:** Dr. Sachin D N, Assistant Professor, Department of CSE, IIIT Bhopal  
 **Fellowship Program:** IndiaAI Fellowship 2026–27 (Technical Screening Submission)  
 **Author:** Senior Federated Learning Research Scientist & ML Systems Architect  
 **Document Status:** Formal Metric Specification (`Phase 1`)  
