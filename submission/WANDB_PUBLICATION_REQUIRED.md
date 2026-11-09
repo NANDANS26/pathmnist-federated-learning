@@ -26,8 +26,9 @@ To publish the completed 5-seed benchmark to your personal or academic Weights &
 ### Step 1: Authenticate with your W&B Account
 Open a local PowerShell prompt in `pathmnist-federated-learning-audit` and run:
 ```powershell
-.venv\Scripts\wandb.exe login
+.venv\Scripts\python.exe -m wandb login
 ```
+*(Note: Invoking via `python.exe -m wandb` avoids Windows Application Control policy blocks on virtual environment `.exe` wrappers).*
 *(Paste your private W&B API key when prompted in your private terminal; do not share or paste this key into any shared chat).*
 
 ### Step 2: Run the Non-Destructive Publishing Script
