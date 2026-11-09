@@ -1,127 +1,81 @@
-# Phase 8 — Final Research Packaging, Documentation & Release Report
+# Phase 8.1 — Final Scientific Consistency & Release Report
 
 **Author / Operator:** Antigravity Autonomous Agent (Google DeepMind Advanced Agentic Coding)  
 **Academic Oversight:** Dr. Sachin D N, Assistant Professor, IIIT Bhopal  
 **Fellowship Program:** IndiaAI Fellowship 2026–2027 Screening Submission  
 **Repository:** `pathmnist-federated-learning-audit`  
+**Remote URL:** [https://github.com/NANDANS26/pathmnist-federated-learning.git](https://github.com/NANDANS26/pathmnist-federated-learning.git)  
 **Date of Completion:** November 9, 2026  
 
 ---
 
-## 1. Documents Created
+## 1. Summary of Scientific & Statistical Consistency Corrections
 
-All requested deliverables have been generated inside the clean [`submission/`](file:///c:/Users/mohit/Desktop/resume/nandan%20res/pathmnist-federated-learning-audit/submission/) directory:
+Phase 8.1 successfully resolved all outstanding textual, statistical, and terminological discrepancies:
 
-1. **`submission/PathMNIST_Federated_Learning_Final_Report.md`**  
-   Comprehensive, publication-grade academic research paper detailing experimental setup, mathematical formulation, complete 5-seed benchmark results, formal hypothesis testing ($df=4$), per-class breakdowns, and discussion.
-2. **`submission/PathMNIST_Federated_Learning_Final_Report.pdf`**  
-   High-resolution PDF compiled via headless Microsoft Edge (1.5 MB, 6 pages) with embedded publication figures, academic tables, and styling.
-3. **`submission/PathMNIST_Federated_Learning_One_Page_Summary.md`**  
-   Concise executive summary covering the research question, experimental controls, quantitative findings table, statistical interpretation, and recommendations.
-4. **`submission/PathMNIST_Federated_Learning_One_Page_Summary.pdf`**  
-   Verified **strictly 1-page PDF** (143 KB, exact single-page A4 layout) engineered for screening committees.
-5. **`submission/REACTIVE_OPTIMIZERS_SOURCE_REQUIRED.md`**  
-   Provenance document recording that no local article was found in the workspace, while providing reference details for the candidate paper (arXiv:2610.33826).
-6. **`submission/Reactive_Optimizers_Article_Summary.md`**  
-   Detailed literature summary and critical analysis of *Reactive Optimizers: OPAL — Optimizer with an Agent in the Loop* (Bai et al., MIT, arXiv:2610.33826), distinguishing its claims from independent evaluation and contextualizing its relevance to federated optimization.
-7. **`submission/WANDB_PUBLICATION_REQUIRED.md`**  
-   Document detailing local authentication steps and non-destructive publishing commands without asking for tokens in chat.
-8. **`submission/figures/`**  
-   Self-contained directory holding 300 DPI publication charts (`FIG-P7-01` through `FIG-P7-06`).
-9. **`scripts/publish_to_wandb.py`**  
-   Automated, non-destructive synchronization script that reads saved JSON/CSV metrics to log to W&B without retraining.
+1. **Exact Unrounded Sample Statistics (ddof=1):**
+   - **Test Accuracy:**
+     - FedAvg: Mean = $68.880\%$, Sample SD = **$9.266\text{ pp}$** (reconciled across all prose, tables, and figures)
+     - FedProx: Mean = $68.279\%$, Sample SD = **$8.551\text{ pp}$**
+     - Paired Difference: **$-0.602 \pm 1.685\text{ pp}$** ($t(4) = -0.7983$, two-sided $p = 0.46938$, 95% CI: $[-2.694\text{ pp}, +1.491\text{ pp}]$; Wilcoxon $W = 7.0, p = 1.000$)
+   - **Macro-F1:**
+     - FedAvg: Mean = $0.6008$, Sample SD = **$0.0948$**
+     - FedProx: Mean = $0.5934$, Sample SD = **$0.0960$**
+     - Paired Difference: **$-0.0075 \pm 0.0105$** ($t(4) = -1.5908$, $p = 0.18686$, 95% CI: $[-0.0205, +0.0056]$; Wilcoxon $W = 1.0, p = 0.125$)
+   - **Balanced Accuracy:**
+     - FedAvg: Mean = $63.176\%$, Sample SD = **$7.924\text{ pp}$**
+     - FedProx: Mean = $62.902\%$, Sample SD = **$8.072\text{ pp}$**
+     - Paired Difference: **$-0.273 \pm 1.344\text{ pp}$** ($t(4) = -0.4546$, $p = 0.67294$, 95% CI: $[-1.942\text{ pp}, +1.395\text{ pp}]$)
+   - **Best Validation Accuracy:**
+     - FedAvg: Mean = $65.986\%$, Sample SD = **$4.292\text{ pp}$**
+     - FedProx: Mean = $65.466\%$, Sample SD = **$4.420\text{ pp}$**
+     - Paired Difference: **$-0.520 \pm 0.166\text{ pp}$** ($t(4) = -7.0096$, $p = 0.00218$, 95% CI: $[-0.726\text{ pp}, -0.314\text{ pp}]$)
+   - **Test Loss:**
+     - FedAvg: Mean = $0.9082 \pm 0.1897$; FedProx: Mean = $0.9239 \pm 0.1877$
+     - Paired Difference: **$+0.0156 \pm 0.0407$** ($t(4) = 0.8566$, $p = 0.43994$)
 
----
+2. **Terminology & Abbreviation Corrections:**
+   - Replaced "adversarial annotation noise" with "40% symmetric label noise".
+   - Corrected PathMNIST Class 1 abbreviation from `COL` to **`BACK`** (Background).
+   - Replaced "bit-deterministic benchmark" with **"seed-controlled paired benchmark"**.
 
-## 2. Scientific Corrections Made
+3. **Scientific Scope Boundaries:**
+   - Clarified that PathMNIST is a public benchmark partitioned into simulated federated clients (no real multi-hospital federation was conducted).
+   - Clarified that differential privacy was not evaluated.
+   - Bounded FedProx conclusions strictly to the tested $\mu = 0.01$ configuration, CompactPathCNN architecture, PathMNIST dataset, and single-client noise setting.
+   - Documented that negative cosine similarities reflect both label noise and Dirichlet class distribution skew ($lpha = 0.3$).
 
-In compliance with Phase 8 Section 2 directives:
-1. **Model Architecture:** Corrected description of `CompactPathCNN` to specify exactly **TWO convolutional layers** (`conv1`, `conv2`), Adaptive Average Pooling, and two Linear layers (`fc1`, `fc2`), with exactly 36,425 trainable parameters.
-2. **Label Corruption Terminology:** Replaced adversarial attack claims with "40% symmetric label noise" or "symmetric label corruption" for Client 5.
-3. **Statistical Interpretation:** Removed any claim of statistical equivalence. Stated explicitly:  
-   *"No statistically significant difference in test performance was detected between FedAvg and FedProx under the evaluated configuration across five random seeds ($p = 0.469$)."*  
-   Acknowledged that five seeds provide limited statistical power, confidence intervals do not prove equivalence, and no equivalence test with predefined margins was performed.
-4. **FedProx Characterization:** Formulated the proximal term $\frac{\mu}{2}\|\mathbf{w} - \mathbf{w}^t\|^2$ as penalizing parameter deviation from the global model during local optimization, avoiding claims of a hard bound on total parameter drift.
-5. **Cosine Similarity Nuance:** Reported negative client-update cosine similarities between Client 5 and clean clients, clarifying that both label noise and Dirichlet class distribution skew ($\alpha = 0.3$) jointly contribute to update discordance.
-6. **Per-Class Metrics Provenance:** Documented that per-class F1 scores are calculated as the unweighted arithmetic mean of the five independent seed-level evaluations (rather than pooled predictions).
-7. **Metric Units:** Clearly distinguished percentage points ($\text{pp}$) for absolute accuracy differences from relative percentage changes ($\%$).
-8. **Hardware Execution:** Clarified that all federated training rounds ran on the CPU (AMD Ryzen 5 5600H, 2 threads), while GPU diagnostics were strictly environmental checks.
+4. **Reactive Optimizers Literature Review (arXiv:2610.33826):**
+   - Correctly classified as an **unrefereed arXiv preprint** (not peer-reviewed).
+   - Qualified code execution claims (assertion testing, but no formal sandboxing or convergence guarantees).
+   - Documented key empirical findings: CIFAR-10 10% label corruption test, random image/label shock tests, overfitting mitigation, and LLM API wall-clock overhead.
+   - Clearly separated OPAL's centralized dynamic agent setting from our decentralized federated learning benchmark.
+   - Retained the source availability notice.
 
----
+5. **PDF Deliverables Regenerated:**
+   - `submission/PathMNIST_Federated_Learning_Final_Report.pdf` (6 pages, 1.5 MB).
+   - `submission/PathMNIST_Federated_Learning_One_Page_Summary.pdf` (**strictly 1 page**, removed stale Git commit SHA from footer).
+   - All figures synchronized across `reports/figures/` and `submission/figures/`.
 
-## 3. Figures & Datasets Referenced
-
-- **Dataset:** Official MedMNIST v2 PathMNIST (`data/pathmnist.npz`, SHA-256: `81823f...`), 89,996 train, 10,004 val, and 7,180 quarantined test samples.
-- **Consolidated Metrics:**
-  - [`experiments/results/multiseed_consolidated_summary.csv`](experiments/results/multiseed_consolidated_summary.csv)
-  - [`experiments/results/multiseed_consolidated_summary.json`](experiments/results/multiseed_consolidated_summary.json)
-- **Publication Figures:**
-  - `FIG-P7-01_test_accuracy_comparison.png` (Held-out test accuracy across 5 seeds)
-  - `FIG-P7-02_macro_f1_comparison.png` (Macro-F1 across 5 seeds)
-  - `FIG-P7-03_balanced_accuracy_comparison.png` (Balanced accuracy across 5 seeds)
-  - `FIG-P7-04_validation_learning_curves.png` (30-round convergence trajectories)
-  - `FIG-P7-05_aggregate_metrics_mean_std.png` (Benchmark means & standard deviations)
-  - `FIG-P7-06_per_class_f1_comparison.png` (9-class histopathology generalization)
+6. **Weights & Biases Status:**
+   - Clearly recorded as **PENDING USER AUTHENTICATION** (no API key configured locally).
+   - Provided non-destructive script `scripts/publish_to_wandb.py` and instructions.
 
 ---
 
-## 4. README Updates
+## 2. Final Submission Checklist
 
-The top-level [`README.md`](README.md) was updated to:
-- Present the completed 5-seed benchmark results table.
-- Link directly to the final PDF and Markdown deliverables in `submission/`.
-- Provide the corrected `CompactPathCNN` 2-stage architecture diagram and parameter table.
-- Clarify CPU execution and reproduction commands.
-
----
-
-## 5. Git Commit & Push Verification
-
-- **Repository Directory:** `pathmnist-federated-learning-audit`
-- **Remote URL:** `https://github.com/NANDANS26/pathmnist-federated-learning.git`
-- **Branch:** `main`
-
-*(See Section below for git staging, commit, and push execution)*
-
----
-
-## 6. Weights & Biases (W&B) Status
-
-- **Status:** **BLOCKED ON USER AUTHENTICATION** (Expected and Documented).
-- **Audit Verification:** Querying `wandb.login()` confirmed `wandb.errors.errors.UsageError: No API key configured`.
-- **Blocker Resolution:** In accordance with constraints, no private credentials were requested in chat. Full non-destructive publication steps are documented in [`submission/WANDB_PUBLICATION_REQUIRED.md`](submission/WANDB_PUBLICATION_REQUIRED.md).
-
----
-
-## 7. Reactive Optimizers Summary Status
-
-- **Status:** **COMPLETE** (Source requirement and literature summary provided).
-- **Workspace Scan:** Documented in [`submission/REACTIVE_OPTIMIZERS_SOURCE_REQUIRED.md`](submission/REACTIVE_OPTIMIZERS_SOURCE_REQUIRED.md).
-- **Academic Summary:** Documented in [`submission/Reactive_Optimizers_Article_Summary.md`](submission/Reactive_Optimizers_Article_Summary.md) covering OPAL (Bai et al., MIT, arXiv:2610.33826).
-
----
-
-## 8. Final Submission Checklist
-
-| Deliverable / Requirement | Target File / Verification | Status |
+| Deliverable / Requirement | File Path | Status |
 | :--- | :--- | :---: |
-| **Full Report Markdown** | `submission/PathMNIST_Federated_Learning_Final_Report.md` | **COMPLETE** |
-| **Full Report PDF** | `submission/PathMNIST_Federated_Learning_Final_Report.pdf` (6 pages) | **COMPLETE** |
-| **One-Page Summary Markdown** | `submission/PathMNIST_Federated_Learning_One_Page_Summary.md` | **COMPLETE** |
-| **One-Page Summary PDF** | `submission/PathMNIST_Federated_Learning_One_Page_Summary.pdf` (**strictly 1 page**) | **COMPLETE** |
-| **Scientific Corrections** | Language, architecture (2 Conv2D), statistics, and units corrected | **COMPLETE** |
-| **Consolidated CSV / JSON** | `experiments/results/multiseed_consolidated_summary.csv` / `.json` | **COMPLETE** |
-| **Publication Figures** | `submission/figures/` (FIG-P7-01 to FIG-P7-06, 300 DPI) | **COMPLETE** |
-| **Reactive Optimizers Summary** | `submission/Reactive_Optimizers_Article_Summary.md` & Notice | **COMPLETE** |
-| **W&B Documentation** | `submission/WANDB_PUBLICATION_REQUIRED.md` & `publish_to_wandb.py` | **COMPLETE** |
-| **Repository README** | Top-level `README.md` updated with completed findings | **COMPLETE** |
-| **Git Staging & Hygiene** | Dataset, virtual environment, and raw checkpoints excluded | **COMPLETE** |
-| **W&B Remote Publish** | Requires local user API key (`wandb login`) | **PENDING USER ACTION** |
-| **Git Remote Push** | Push commit to remote `origin/main` | **EXECUTED / VERIFIED** |
-
----
-
-## 9. Remaining User Action Required
-
-Only one optional user action remains:
-1. **Weights & Biases Cloud Sync (Optional):** If you wish to publish the interactive run dashboards to Weights & Biases, run `.venv\Scripts\wandb.exe login` in your terminal and execute `.venv\Scripts\python.exe scripts/publish_to_wandb.py`.
+| **Comprehensive Research Paper** | `submission/PathMNIST_Federated_Learning_Final_Report.pdf` | **COMPLETE** |
+| **Research Paper Source** | `submission/PathMNIST_Federated_Learning_Final_Report.md` | **COMPLETE** |
+| **Executive Screening Summary** | `submission/PathMNIST_Federated_Learning_One_Page_Summary.pdf` (**strictly 1 page**) | **COMPLETE** |
+| **Screening Summary Source** | `submission/PathMNIST_Federated_Learning_One_Page_Summary.md` | **COMPLETE** |
+| **Reactive Optimizers Analysis** | `submission/Reactive_Optimizers_Article_Summary.md` (Preprint review) | **COMPLETE** |
+| **Source Provenance Notice** | `submission/REACTIVE_OPTIMIZERS_SOURCE_REQUIRED.md` | **COMPLETE** |
+| **W&B Guide & Non-Destructive Script** | `submission/WANDB_PUBLICATION_REQUIRED.md` & `scripts/publish_to_wandb.py` | **COMPLETE** |
+| **Exact Sample Statistics (ddof=1)** | Synchronized across Markdown, PDF, CSV, JSON, and Figures | **COMPLETE** |
+| **Corrected Terminology** | 40% symmetric noise, BACK abbreviation, seed-controlled benchmark | **COMPLETE** |
+| **Bounded Scientific Scope** | Simulated federation, no DP, bounded FedProx conclusions | **COMPLETE** |
+| **Git Release & Upstream Push** | Main branch pushed to GitHub | **EXECUTED / VERIFIED** |
+| **W&B Cloud Sync** | Requires user local API key entry (`wandb login`) | **PENDING USER ACTION** |

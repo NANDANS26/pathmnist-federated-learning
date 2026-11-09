@@ -1,15 +1,10 @@
 """
-Consolidation and Scientific Visualization for Phase 7 Multi-Seed FL Experiment.
+Consolidation and Scientific Visualization for Multi-Seed FL Experiment.
 Processes all five research seeds: 42, 123, 2026, 3407, 7777.
-Generates:
+Generates exact sample statistics (ddof=1) and publication-quality figures:
   - experiments/results/multiseed_consolidated_summary.json
   - experiments/results/multiseed_consolidated_summary.csv
-  - reports/figures/FIG-P7-01_test_accuracy_comparison.png
-  - reports/figures/FIG-P7-02_macro_f1_comparison.png
-  - reports/figures/FIG-P7-03_balanced_accuracy_comparison.png
-  - reports/figures/FIG-P7-04_validation_learning_curves.png
-  - reports/figures/FIG-P7-05_aggregate_metrics_mean_std.png
-  - reports/figures/FIG-P7-06_per_class_f1_comparison.png
+  - reports/figures/ & submission/figures/
 """
 
 import os
@@ -22,6 +17,7 @@ import matplotlib.pyplot as plt
 
 PROJ_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ARTIFACT_DIR = r"C:\Users\mohit\.gemini\antigravity\brain\6c9e6809-31d9-4d77-b974-cccbb65cf12c"
+SUBMISSION_FIG_DIR = os.path.join(PROJ_ROOT, "submission", "figures")
 
 SEED_DIRS = [
     (42, os.path.join(PROJ_ROOT, "experiments", "seed_42_attempt_3")),
@@ -52,7 +48,6 @@ def load_all_seeds():
         with open(sum_file, "r", encoding="utf-8") as f:
             summaries.append(json.load(f))
         
-        # Load round-level logs for learning curves
         avg_log = glob.glob(os.path.join(sdir, "logs", "fedavg*metrics.jsonl"))[0]
         prox_log = glob.glob(os.path.join(sdir, "logs", "fedprox*metrics.jsonl"))[0]
         
@@ -97,16 +92,12 @@ def compute_paired_tests(avg_vals, prox_vals):
     std_diff = float(np.std(diffs, ddof=1))
     sem_diff = float(std_diff / np.sqrt(n))
     
-    # Paired t-test
     t_stat, p_val = stats.ttest_rel(prox_vals, avg_vals)
-    
-    # 95% Confidence Interval with Student-t (df = n - 1)
     df = n - 1
     t_crit = float(stats.t.ppf(0.975, df=df))
     ci_lower = mean_diff - t_crit * sem_diff
     ci_upper = mean_diff + t_crit * sem_diff
     
-    # Wilcoxon signed rank test
     try:
         w_res = stats.wilcoxon(prox_vals, avg_vals)
         w_stat, w_pval = float(w_res.statistic), float(w_res.pvalue)
@@ -130,9 +121,7 @@ def compute_paired_tests(avg_vals, prox_vals):
 def main():
     summaries, round_logs = load_all_seeds()
     seeds = [s["seed"] for s in summaries]
-    print(f"Loaded summaries for {len(seeds)} seeds: {seeds}")
 
-    # Extract metrics
     metrics = {
         "fedavg": {
             "test_accuracy": [s["fedavg"]["test_accuracy"] for s in summaries],
@@ -154,7 +143,6 @@ def main():
         }
     }
 
-    # Paired differences
     paired_deltas = {
         "test_accuracy": [p - a for a, p in zip(metrics["fedavg"]["test_accuracy"], metrics["fedprox"]["test_accuracy"])],
         "test_macro_f1": [p - a for a, p in zip(metrics["fedavg"]["test_macro_f1"], metrics["fedprox"]["test_macro_f1"])],
@@ -164,7 +152,6 @@ def main():
         "wall_clock_minutes": [p - a for a, p in zip(metrics["fedavg"]["wall_clock_minutes"], metrics["fedprox"]["wall_clock_minutes"])]
     }
 
-    # Build consolidated dict
     consolidation = {
         "study": "IndiaAI Fellowship 2026-27 PathMNIST FL Research",
         "protocol": "FedAvg vs FedProx (mu=0.01), 5 clients, Dirichlet alpha=0.3, Client 5 40% label noise, 30 rounds",
@@ -184,13 +171,10 @@ def main():
         }
     }
 
-    # Save JSON
     out_json = os.path.join(PROJ_ROOT, "experiments", "results", "multiseed_consolidated_summary.json")
     with open(out_json, "w", encoding="utf-8") as f:
         json.dump(consolidation, f, indent=2)
-    print(f"Saved: {out_json}")
 
-    # Save CSV
     out_csv = os.path.join(PROJ_ROOT, "experiments", "results", "multiseed_consolidated_summary.csv")
     with open(out_csv, "w", encoding="utf-8") as f:
         f.write("seed,algorithm,best_val_round,val_acc,val_loss,test_acc,test_macro_f1,test_bal_acc,test_loss,wall_clock_min\n")
@@ -200,13 +184,13 @@ def main():
             p = s["fedprox"]
             f.write(f"{sd},FedAvg,{a['best_validation_round']},{a['best_validation_accuracy']:.5f},{a['best_validation_loss']:.5f},{a['test_accuracy']:.5f},{a['test_macro_f1']:.5f},{a['test_balanced_accuracy']:.5f},{a['test_loss']:.5f},{a['wall_clock_minutes']:.2f}\n")
             f.write(f"{sd},FedProx,{p['best_validation_round']},{p['best_validation_accuracy']:.5f},{p['best_validation_loss']:.5f},{p['test_accuracy']:.5f},{p['test_macro_f1']:.5f},{p['test_balanced_accuracy']:.5f},{p['test_loss']:.5f},{p['wall_clock_minutes']:.2f}\n")
-    print(f"Saved: {out_csv}")
 
     # -------------------------------------------------------------
-    # GENERATE PUBLICATION-QUALITY FIGURES
+    # PLOTTING
     # -------------------------------------------------------------
     fig_dir = os.path.join(PROJ_ROOT, "reports", "figures")
     os.makedirs(fig_dir, exist_ok=True)
+    os.makedirs(SUBMISSION_FIG_DIR, exist_ok=True)
     os.makedirs(ARTIFACT_DIR, exist_ok=True)
     artifact_fig_dir = os.path.join(ARTIFACT_DIR, "figures")
     os.makedirs(artifact_fig_dir, exist_ok=True)
@@ -216,9 +200,17 @@ def main():
         "fedavg": "#1f77b4",
         "fedprox": "#ff7f0e",
         "delta_pos": "#2ca02c",
-        "delta_neg": "#d62728",
-        "neutral": "#7f7f7f"
+        "delta_neg": "#d62728"
     }
+
+    # Helper to save figure to all required locations
+    def save_fig(fig, fname):
+        fpath = os.path.join(fig_dir, fname)
+        fig.savefig(fpath, dpi=300)
+        shutil.copy(fpath, os.path.join(SUBMISSION_FIG_DIR, fname))
+        shutil.copy(fpath, os.path.join(artifact_fig_dir, fname))
+        shutil.copy(fpath, os.path.join(ARTIFACT_DIR, fname))
+        plt.close(fig)
 
     # 1. FIG-P7-01: Test Accuracy Comparison across 5 seeds
     fig, ax = plt.subplots(figsize=(10, 6), dpi=300)
@@ -228,47 +220,42 @@ def main():
     avg_accs = [m * 100 for m in metrics["fedavg"]["test_accuracy"]]
     prox_accs = [m * 100 for m in metrics["fedprox"]["test_accuracy"]]
 
-    rects1 = ax.bar(x - width/2, avg_accs, width, label="FedAvg", color=colors["fedavg"], alpha=0.85, edgecolor="black")
-    rects2 = ax.bar(x + width/2, prox_accs, width, label="FedProx (μ=0.01)", color=colors["fedprox"], alpha=0.85, edgecolor="black")
+    ax.bar(x - width/2, avg_accs, width, label="FedAvg", color=colors["fedavg"], alpha=0.85, edgecolor="black")
+    ax.bar(x + width/2, prox_accs, width, label="FedProx (μ=0.01)", color=colors["fedprox"], alpha=0.85, edgecolor="black")
 
     ax.set_ylabel("Test Accuracy (%)", fontsize=12, fontweight="bold")
-    ax.set_title("Test Accuracy Comparison Across All 5 Seeds (Held-Out Test Split)", fontsize=14, fontweight="bold", pad=15)
+    ax.set_title("Held-Out Test Accuracy Across 5 Canonical Seeds (PathMNIST)", fontsize=13, fontweight="bold", pad=15)
     ax.set_xticks(x)
     ax.set_xticklabels([f"Seed {s}" for s in seeds], fontsize=11, fontweight="bold")
     ax.legend(loc="lower right", fontsize=11, frameon=True)
-    ax.set_ylim(0, 90)
+    ax.set_ylim(0, 92)
 
     for i in range(len(seeds)):
         delta = prox_accs[i] - avg_accs[i]
         d_color = colors["delta_pos"] if delta >= 0 else colors["delta_neg"]
         ax.annotate(f"{avg_accs[i]:.2f}%", (x[i] - width/2, avg_accs[i] + 1.0), ha='center', va='bottom', fontsize=9)
         ax.annotate(f"{prox_accs[i]:.2f}%", (x[i] + width/2, prox_accs[i] + 1.0), ha='center', va='bottom', fontsize=9)
-        ax.annotate(f"Δ: {delta:+.2f}%", (x[i], max(avg_accs[i], prox_accs[i]) + 4.5), ha='center', va='bottom',
+        ax.annotate(f"Δ: {delta:+.2f} pp", (x[i], max(avg_accs[i], prox_accs[i]) + 4.5), ha='center', va='bottom',
                     fontsize=9, fontweight='bold', color=d_color,
                     bbox=dict(boxstyle="round,pad=0.2", facecolor="white", edgecolor=d_color, alpha=0.9))
 
     plt.tight_layout()
-    f1_path = os.path.join(fig_dir, "FIG-P7-01_test_accuracy_comparison.png")
-    plt.savefig(f1_path, dpi=300)
-    shutil.copy(f1_path, os.path.join(artifact_fig_dir, "FIG-P7-01_test_accuracy_comparison.png"))
-    shutil.copy(f1_path, os.path.join(ARTIFACT_DIR, "FIG-P7-01_test_accuracy_comparison.png"))
-    plt.close()
-    print("Saved FIG-P7-01")
+    save_fig(fig, "FIG-P7-01_test_accuracy_comparison.png")
 
     # 2. FIG-P7-02: Macro-F1 Comparison across 5 seeds
     fig, ax = plt.subplots(figsize=(10, 6), dpi=300)
     avg_f1s = metrics["fedavg"]["test_macro_f1"]
     prox_f1s = metrics["fedprox"]["test_macro_f1"]
 
-    rects1 = ax.bar(x - width/2, avg_f1s, width, label="FedAvg", color=colors["fedavg"], alpha=0.85, edgecolor="black")
-    rects2 = ax.bar(x + width/2, prox_f1s, width, label="FedProx (μ=0.01)", color=colors["fedprox"], alpha=0.85, edgecolor="black")
+    ax.bar(x - width/2, avg_f1s, width, label="FedAvg", color=colors["fedavg"], alpha=0.85, edgecolor="black")
+    ax.bar(x + width/2, prox_f1s, width, label="FedProx (μ=0.01)", color=colors["fedprox"], alpha=0.85, edgecolor="black")
 
     ax.set_ylabel("Macro-F1 Score", fontsize=12, fontweight="bold")
-    ax.set_title("Test Macro-F1 Score Across All 5 Seeds", fontsize=14, fontweight="bold", pad=15)
+    ax.set_title("Test Macro-F1 Score Across 5 Canonical Seeds", fontsize=13, fontweight="bold", pad=15)
     ax.set_xticks(x)
     ax.set_xticklabels([f"Seed {s}" for s in seeds], fontsize=11, fontweight="bold")
     ax.legend(loc="lower right", fontsize=11, frameon=True)
-    ax.set_ylim(0, 0.85)
+    ax.set_ylim(0, 0.88)
 
     for i in range(len(seeds)):
         delta = prox_f1s[i] - avg_f1s[i]
@@ -280,44 +267,34 @@ def main():
                     bbox=dict(boxstyle="round,pad=0.2", facecolor="white", edgecolor=d_color, alpha=0.9))
 
     plt.tight_layout()
-    f2_path = os.path.join(fig_dir, "FIG-P7-02_macro_f1_comparison.png")
-    plt.savefig(f2_path, dpi=300)
-    shutil.copy(f2_path, os.path.join(artifact_fig_dir, "FIG-P7-02_macro_f1_comparison.png"))
-    shutil.copy(f2_path, os.path.join(ARTIFACT_DIR, "FIG-P7-02_macro_f1_comparison.png"))
-    plt.close()
-    print("Saved FIG-P7-02")
+    save_fig(fig, "FIG-P7-02_macro_f1_comparison.png")
 
     # 3. FIG-P7-03: Balanced Accuracy Comparison across 5 seeds
     fig, ax = plt.subplots(figsize=(10, 6), dpi=300)
     avg_bals = [m * 100 for m in metrics["fedavg"]["test_balanced_accuracy"]]
     prox_bals = [m * 100 for m in metrics["fedprox"]["test_balanced_accuracy"]]
 
-    rects1 = ax.bar(x - width/2, avg_bals, width, label="FedAvg", color=colors["fedavg"], alpha=0.85, edgecolor="black")
-    rects2 = ax.bar(x + width/2, prox_bals, width, label="FedProx (μ=0.01)", color=colors["fedprox"], alpha=0.85, edgecolor="black")
+    ax.bar(x - width/2, avg_bals, width, label="FedAvg", color=colors["fedavg"], alpha=0.85, edgecolor="black")
+    ax.bar(x + width/2, prox_bals, width, label="FedProx (μ=0.01)", color=colors["fedprox"], alpha=0.85, edgecolor="black")
 
     ax.set_ylabel("Balanced Accuracy (%)", fontsize=12, fontweight="bold")
-    ax.set_title("Test Balanced Accuracy Across All 5 Seeds", fontsize=14, fontweight="bold", pad=15)
+    ax.set_title("Test Balanced Accuracy Across 5 Canonical Seeds", fontsize=13, fontweight="bold", pad=15)
     ax.set_xticks(x)
     ax.set_xticklabels([f"Seed {s}" for s in seeds], fontsize=11, fontweight="bold")
     ax.legend(loc="lower right", fontsize=11, frameon=True)
-    ax.set_ylim(0, 85)
+    ax.set_ylim(0, 88)
 
     for i in range(len(seeds)):
         delta = prox_bals[i] - avg_bals[i]
         d_color = colors["delta_pos"] if delta >= 0 else colors["delta_neg"]
         ax.annotate(f"{avg_bals[i]:.2f}%", (x[i] - width/2, avg_bals[i] + 1.0), ha='center', va='bottom', fontsize=9)
         ax.annotate(f"{prox_bals[i]:.2f}%", (x[i] + width/2, prox_bals[i] + 1.0), ha='center', va='bottom', fontsize=9)
-        ax.annotate(f"Δ: {delta:+.2f}%", (x[i], max(avg_bals[i], prox_bals[i]) + 4.0), ha='center', va='bottom',
+        ax.annotate(f"Δ: {delta:+.2f} pp", (x[i], max(avg_bals[i], prox_bals[i]) + 4.0), ha='center', va='bottom',
                     fontsize=9, fontweight='bold', color=d_color,
                     bbox=dict(boxstyle="round,pad=0.2", facecolor="white", edgecolor=d_color, alpha=0.9))
 
     plt.tight_layout()
-    f3_path = os.path.join(fig_dir, "FIG-P7-03_balanced_accuracy_comparison.png")
-    plt.savefig(f3_path, dpi=300)
-    shutil.copy(f3_path, os.path.join(artifact_fig_dir, "FIG-P7-03_balanced_accuracy_comparison.png"))
-    shutil.copy(f3_path, os.path.join(ARTIFACT_DIR, "FIG-P7-03_balanced_accuracy_comparison.png"))
-    plt.close()
-    print("Saved FIG-P7-03")
+    save_fig(fig, "FIG-P7-03_balanced_accuracy_comparison.png")
 
     # 4. FIG-P7-04: Validation Learning Curves across all 30 rounds for all 5 seeds
     fig, axes = plt.subplots(2, 3, figsize=(15, 10), dpi=300)
@@ -340,15 +317,14 @@ def main():
         ax.grid(True, linestyle=":", alpha=0.6)
         ax.legend(loc="lower right", fontsize=9)
 
-    # 6th panel: Mean across all 5 seeds
     ax_mean = axes_flat[5]
     all_avg_curves = np.array([[r["val/global_accuracy"] * 100 for r in round_logs[s]["fedavg"]] for s in seeds])
     all_prox_curves = np.array([[r["val/global_accuracy"] * 100 for r in round_logs[s]["fedprox"]] for s in seeds])
 
     mean_avg_curve = np.mean(all_avg_curves, axis=0)
-    std_avg_curve = np.std(all_avg_curves, axis=0)
+    std_avg_curve = np.std(all_avg_curves, axis=0, ddof=1)
     mean_prox_curve = np.mean(all_prox_curves, axis=0)
-    std_prox_curve = np.std(all_prox_curves, axis=0)
+    std_prox_curve = np.std(all_prox_curves, axis=0, ddof=1)
 
     rounds = list(range(1, 31))
     ax_mean.plot(rounds, mean_avg_curve, label="FedAvg (Mean)", color="#1f77b4", linewidth=2.5)
@@ -357,77 +333,65 @@ def main():
     ax_mean.plot(rounds, mean_prox_curve, label="FedProx (Mean)", color="#ff7f0e", linewidth=2.5, linestyle="--")
     ax_mean.fill_between(rounds, mean_prox_curve - std_prox_curve, mean_prox_curve + std_prox_curve, color="#ff7f0e", alpha=0.2)
 
-    ax_mean.set_title("5-Seed Aggregate Mean ± 1 Std Dev", fontsize=12, fontweight="bold")
+    ax_mean.set_title("5-Seed Aggregate Mean ± 1 Sample SD", fontsize=12, fontweight="bold")
     ax_mean.set_xlabel("Communication Round", fontsize=10)
     ax_mean.set_ylabel("Global Val Accuracy (%)", fontsize=10)
     ax_mean.set_ylim(10, 80)
     ax_mean.grid(True, linestyle=":", alpha=0.6)
     ax_mean.legend(loc="lower right", fontsize=9)
 
-    fig.suptitle("Validation Accuracy Convergence Trajectories Across 30 Rounds", fontsize=16, fontweight="bold", y=0.98)
+    fig.suptitle("Validation Accuracy Convergence Trajectories Across 30 Rounds", fontsize=15, fontweight="bold", y=0.98)
     plt.tight_layout(rect=[0, 0, 1, 0.95])
-    f4_path = os.path.join(fig_dir, "FIG-P7-04_validation_learning_curves.png")
-    plt.savefig(f4_path, dpi=300)
-    shutil.copy(f4_path, os.path.join(artifact_fig_dir, "FIG-P7-04_validation_learning_curves.png"))
-    shutil.copy(f4_path, os.path.join(ARTIFACT_DIR, "FIG-P7-04_validation_learning_curves.png"))
-    plt.close()
-    print("Saved FIG-P7-04")
+    save_fig(fig, "FIG-P7-04_validation_learning_curves.png")
 
-    # 5. FIG-P7-05: Aggregate Mean and Std Dev comparison
+    # 5. FIG-P7-05: Aggregate Mean and Std Dev comparison (Exact sample SD ddof=1)
     fig, ax = plt.subplots(figsize=(10, 6), dpi=300)
     metric_keys = ["Test Accuracy", "Macro-F1", "Balanced Accuracy", "Best Val Accuracy"]
     x_pos = np.arange(len(metric_keys))
 
-    # Normalized percentages for plotting
+    # Calculate exact unrounded values
     avg_means = [
-        consolidation["statistical_summary"]["fedavg"]["test_accuracy"]["mean"] * 100,
-        consolidation["statistical_summary"]["fedavg"]["test_macro_f1"]["mean"] * 100,
-        consolidation["statistical_summary"]["fedavg"]["test_balanced_accuracy"]["mean"] * 100,
-        consolidation["statistical_summary"]["fedavg"]["val_accuracy"]["mean"] * 100
+        float(np.mean(metrics["fedavg"]["test_accuracy"])) * 100,
+        float(np.mean(metrics["fedavg"]["test_macro_f1"])) * 100,
+        float(np.mean(metrics["fedavg"]["test_balanced_accuracy"])) * 100,
+        float(np.mean(metrics["fedavg"]["val_accuracy"])) * 100
     ]
     avg_stds = [
-        consolidation["statistical_summary"]["fedavg"]["test_accuracy"]["std"] * 100,
-        consolidation["statistical_summary"]["fedavg"]["test_macro_f1"]["std"] * 100,
-        consolidation["statistical_summary"]["fedavg"]["test_balanced_accuracy"]["std"] * 100,
-        consolidation["statistical_summary"]["fedavg"]["val_accuracy"]["std"] * 100
+        float(np.std(metrics["fedavg"]["test_accuracy"], ddof=1)) * 100,
+        float(np.std(metrics["fedavg"]["test_macro_f1"], ddof=1)) * 100,
+        float(np.std(metrics["fedavg"]["test_balanced_accuracy"], ddof=1)) * 100,
+        float(np.std(metrics["fedavg"]["val_accuracy"], ddof=1)) * 100
     ]
 
     prox_means = [
-        consolidation["statistical_summary"]["fedprox"]["test_accuracy"]["mean"] * 100,
-        consolidation["statistical_summary"]["fedprox"]["test_macro_f1"]["mean"] * 100,
-        consolidation["statistical_summary"]["fedprox"]["test_balanced_accuracy"]["mean"] * 100,
-        consolidation["statistical_summary"]["fedprox"]["val_accuracy"]["mean"] * 100
+        float(np.mean(metrics["fedprox"]["test_accuracy"])) * 100,
+        float(np.mean(metrics["fedprox"]["test_macro_f1"])) * 100,
+        float(np.mean(metrics["fedprox"]["test_balanced_accuracy"])) * 100,
+        float(np.mean(metrics["fedprox"]["val_accuracy"])) * 100
     ]
     prox_stds = [
-        consolidation["statistical_summary"]["fedprox"]["test_accuracy"]["std"] * 100,
-        consolidation["statistical_summary"]["fedprox"]["test_macro_f1"]["std"] * 100,
-        consolidation["statistical_summary"]["fedprox"]["test_balanced_accuracy"]["std"] * 100,
-        consolidation["statistical_summary"]["fedprox"]["val_accuracy"]["std"] * 100
+        float(np.std(metrics["fedprox"]["test_accuracy"], ddof=1)) * 100,
+        float(np.std(metrics["fedprox"]["test_macro_f1"], ddof=1)) * 100,
+        float(np.std(metrics["fedprox"]["test_balanced_accuracy"], ddof=1)) * 100,
+        float(np.std(metrics["fedprox"]["val_accuracy"], ddof=1)) * 100
     ]
 
-    rects1 = ax.bar(x_pos - width/2, avg_means, width, yerr=avg_stds, capsize=5, label="FedAvg", color=colors["fedavg"], alpha=0.85, edgecolor="black")
-    rects2 = ax.bar(x_pos + width/2, prox_means, width, yerr=prox_stds, capsize=5, label="FedProx (μ=0.01)", color=colors["fedprox"], alpha=0.85, edgecolor="black")
+    ax.bar(x_pos - width/2, avg_means, width, yerr=avg_stds, capsize=5, label="FedAvg", color=colors["fedavg"], alpha=0.85, edgecolor="black")
+    ax.bar(x_pos + width/2, prox_means, width, yerr=prox_stds, capsize=5, label="FedProx (μ=0.01)", color=colors["fedprox"], alpha=0.85, edgecolor="black")
 
     ax.set_ylabel("Score (%)", fontsize=12, fontweight="bold")
-    ax.set_title("5-Seed Aggregate Benchmark Metrics (Mean ± 1 Sample Std Dev)", fontsize=14, fontweight="bold", pad=15)
+    ax.set_title("5-Seed Aggregate Benchmark Metrics (Mean ± 1 Sample SD, ddof=1)", fontsize=13, fontweight="bold", pad=15)
     ax.set_xticks(x_pos)
     ax.set_xticklabels(metric_keys, fontsize=11, fontweight="bold")
     ax.legend(loc="lower right", fontsize=11, frameon=True)
     ax.set_ylim(0, 95)
 
     for i in range(len(metric_keys)):
-        d = prox_means[i] - avg_means[i]
-        d_color = colors["delta_pos"] if d >= 0 else colors["delta_neg"]
         ax.annotate(f"{avg_means[i]:.2f}±{avg_stds[i]:.2f}", (x_pos[i] - width/2, avg_means[i] + avg_stds[i] + 2.0), ha='center', va='bottom', fontsize=9)
         ax.annotate(f"{prox_means[i]:.2f}±{prox_stds[i]:.2f}", (x_pos[i] + width/2, prox_means[i] + prox_stds[i] + 2.0), ha='center', va='bottom', fontsize=9)
 
     plt.tight_layout()
-    f5_path = os.path.join(fig_dir, "FIG-P7-05_aggregate_metrics_mean_std.png")
-    plt.savefig(f5_path, dpi=300)
-    shutil.copy(f5_path, os.path.join(artifact_fig_dir, "FIG-P7-05_aggregate_metrics_mean_std.png"))
-    shutil.copy(f5_path, os.path.join(ARTIFACT_DIR, "FIG-P7-05_aggregate_metrics_mean_std.png"))
-    plt.close()
-    print("Saved FIG-P7-05")
+    save_fig(fig, "FIG-P7-05_aggregate_metrics_mean_std.png")
 
     # 6. FIG-P7-06: Per-class performance comparison across 9 PathMNIST classes
     fig, ax = plt.subplots(figsize=(14, 7), dpi=300)
@@ -443,11 +407,11 @@ def main():
         avg_class_f1s.append(float(np.mean(avg_c)))
         prox_class_f1s.append(float(np.mean(prox_c)))
 
-    rects1 = ax.bar(x_classes - width_c/2, avg_class_f1s, width_c, label="FedAvg", color=colors["fedavg"], alpha=0.85, edgecolor="black")
-    rects2 = ax.bar(x_classes + width_c/2, prox_class_f1s, width_c, label="FedProx (μ=0.01)", color=colors["fedprox"], alpha=0.85, edgecolor="black")
+    ax.bar(x_classes - width_c/2, avg_class_f1s, width_c, label="FedAvg", color=colors["fedavg"], alpha=0.85, edgecolor="black")
+    ax.bar(x_classes + width_c/2, prox_class_f1s, width_c, label="FedProx (μ=0.01)", color=colors["fedprox"], alpha=0.85, edgecolor="black")
 
     ax.set_ylabel("Mean F1-Score Across 5 Seeds", fontsize=12, fontweight="bold")
-    ax.set_title("Per-Class Generalization Comparison (PathMNIST 9 Histopathology Tissue Classes)", fontsize=14, fontweight="bold", pad=15)
+    ax.set_title("Per-Class Generalization Comparison (PathMNIST 9 Histopathology Tissue Classes)", fontsize=13, fontweight="bold", pad=15)
     ax.set_xticks(x_classes)
     ax.set_xticklabels([f"C{c}: {CLASS_NAMES[c]}" for c in range(9)], rotation=25, ha="right", fontsize=10, fontweight="bold")
     ax.legend(loc="upper right", fontsize=11, frameon=True)
@@ -463,14 +427,9 @@ def main():
                     bbox=dict(boxstyle="round,pad=0.15", facecolor="white", edgecolor=d_color, alpha=0.85))
 
     plt.tight_layout()
-    f6_path = os.path.join(fig_dir, "FIG-P7-06_per_class_f1_comparison.png")
-    plt.savefig(f6_path, dpi=300)
-    shutil.copy(f6_path, os.path.join(artifact_fig_dir, "FIG-P7-06_per_class_f1_comparison.png"))
-    shutil.copy(f6_path, os.path.join(ARTIFACT_DIR, "FIG-P7-06_per_class_f1_comparison.png"))
-    plt.close()
-    print("Saved FIG-P7-06")
+    save_fig(fig, "FIG-P7-06_per_class_f1_comparison.png")
 
-    print("\nAll 6 scientific comparison figures generated and verified!")
+    print("Re-plotted and synchronized all 6 figures with exact sample SDs!")
 
 
 if __name__ == "__main__":
