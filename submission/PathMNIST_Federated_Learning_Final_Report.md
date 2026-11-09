@@ -14,7 +14,7 @@ Federated learning (FL) enables decentralized participants to collaboratively tr
 
 In this work, we conduct a seed-controlled paired benchmark comparing Federated Averaging (**FedAvg**) against Federated Proximal Optimization (**FedProx**, proximal parameter $\mu = 0.01$) across five canonical random seeds (42, 123, 2026, 3407, 7777). We evaluate on PathMNIST, a public 9-class colorectal histopathology dataset ($89,996$ training, $10,004$ validation, and $7,180$ test images), partitioned into five simulated federated clients using a Dirichlet distribution ($\alpha = 0.3$). To assess resilience against annotation errors, Client 5 is subjected to exactly $40.00\%$ symmetric label noise. Both algorithms were trained across 30 communication rounds using an identical 2-stage convolutional network (**CompactPathCNN**, 36,425 trainable parameters), identical seed-specific partitions, and identical initialization weights, totaling 300 executed communication rounds on an AMD Ryzen 5 5600H CPU execution platform.
 
-Over the five seeds, FedAvg achieved a mean held-out test accuracy of $68.880\% \pm 9.266\text{ pp}$ (mean macro-F1: $0.6008 \pm 0.0948$), while FedProx achieved $68.279\% \pm 8.551\text{ pp}$ (mean macro-F1: $0.5934 \pm 0.0960$), yielding a paired difference of $-0.602 \pm 1.685\text{ pp}$ in test accuracy ($t(4) = -0.7983$, two-sided $p = 0.46938$, 95% CI: $[-2.694\text{ pp}, +1.491\text{ pp}]$) and $-0.0075 \pm 0.0105$ in macro-F1 ($t(4) = -1.5908$, $p = 0.18686$, 95% CI: $[-0.0205, +0.0056]$). Under the evaluated configuration, **no statistically significant difference in test performance was detected between FedAvg and FedProx across the five random seeds**. Because five seeds provide limited statistical power and no formal equivalence test with predefined equivalence margins was conducted, this non-significant result does not establish statistical equivalence. Mechanistically, the proximal penalty restricts the Euclidean step size of local parameter updates but does not alter the corrupted gradient directions induced by noisy annotations. Consequently, generic proximal drift penalties alone are insufficient to neutralize severe client-level label corruption in simulated histopathological federated learning without explicit noise filtering or adaptive client reweighting.
+Over the five seeds, FedAvg achieved a mean held-out test accuracy of $68.880\% \pm 9.266\text{ pp}$ (mean macro-F1: $0.6008 \pm 0.0948$), while FedProx achieved $68.279\% \pm 8.551\text{ pp}$ (mean macro-F1: $0.5934 \pm 0.0960$), yielding a paired difference of $-0.602 \pm 1.685\text{ pp}$ in test accuracy ($t(4) = -0.7983$, two-sided $p = 0.46938$, 95% CI: $[-2.694\text{ pp}, +1.491\text{ pp}]$) and $-0.0075 \pm 0.0105$ in macro-F1 ($t(4) = -1.5908$, $p = 0.18686$, 95% CI: $[-0.0205, +0.0056]$). Under the evaluated configuration, **no statistically significant difference in test performance was detected between FedAvg and FedProx across the five random seeds**. Because five seeds provide limited statistical power and no formal equivalence test with predefined equivalence margins was conducted, this non-significant result does not establish statistical equivalence. Mechanistically, the proximal penalty penalizes parameter deviation from the global model but does not alter the corrupted gradient directions induced by noisy annotations. Consequently, under the evaluated configuration (PathMNIST, simulated five-client federation, Dirichlet $\alpha = 0.3$, single-client $40\%$ symmetric noise, CompactPathCNN, and FedProx $\mu = 0.01$), proximal regularization alone did not overcome annotation noise without explicit noise filtering or adaptive client reweighting.
 
 ---
 
@@ -69,7 +69,7 @@ To enable computationally efficient federated optimization, we instantiated **Co
 - **Federated Averaging (FedAvg):** At communication round $t$, the server broadcasts global weights $\mathbf{w}^t$. Each client $k$ minimizes local empirical cross-entropy loss $\mathcal{L}_k(\mathbf{w})$ over $E = 2$ epochs using SGD with batch size $B = 32$ and learning rate $\eta = 0.01$. The server aggregates local weights via sample weighting: $\mathbf{w}^{t+1} = \sum_{k=1}^K \frac{n_k}{N} \mathbf{w}_k^{t, E}$.
 - **Federated Proximal Optimization (FedProx):** Adds a proximal regularization term to the local objective:
   $$\min_{\mathbf{w}} h_k(\mathbf{w}; \mathbf{w}^t) = \mathcal{L}_k(\mathbf{w}) + \frac{\mu}{2} \|\mathbf{w} - \mathbf{w}^t\|^2$$
-  Here $\mu = 0.01$. The proximal term penalizes deviation from the global model during local optimization, pulling local updates toward $\mathbf{w}^t$. Importantly, this term does not impose a hard bound on total parameter drift, but continuously scales the effective restoring force with Euclidean distance.
+  Here $\mu = 0.01$. The proximal term penalizes deviation from the global model during local optimization, pulling local updates toward $\mathbf{w}^t$. Importantly, this term does not impose a hard bound on parameter updates, but continuously penalizes parameter deviation from the global model with Euclidean distance.
 
 ---
 
@@ -117,7 +117,7 @@ We evaluated the null hypothesis $H_0: \mu_{\text{FedProx}} - \mu_{\text{FedAvg}
    - Mean Paired Difference: $\bar{d} = -0.520\text{ pp}$ ($s_d = 0.166\text{ pp}$, $\text{SE} = 0.074\text{ pp}$)
    - Paired Student-$t$ Statistic: $t(4) = -7.0096$, $p = 0.00218$
    - $95\%$ Confidence Interval: $[-0.726\text{ pp}, -0.314\text{ pp}]$
-   - *Interpretation:* Peak global validation accuracy was consistently slightly higher for FedAvg across all five seeds ($0.27$ to $0.68\text{ pp}$ advantage), reflecting the slight regularizing drag imposed by the proximal term $\mu = 0.01$ on clean client optimization.
+   - *Interpretation:* Peak global validation accuracy was slightly higher for FedAvg across all five seeds (mean difference $-0.520 \pm 0.166\text{ pp}$, ranging from $0.27$ to $0.68\text{ pp}$ advantage, paired $t(4) = -7.0096, p = 0.00218$). We report this empirical difference directly, without asserting an unsupported causal claim that the proximal term caused this difference.
 
 5. **Test Loss:**
    - FedAvg Mean = $0.9082 \pm 0.1897$; FedProx Mean = $0.9239 \pm 0.1877$
@@ -178,7 +178,7 @@ Per-class F1 metrics were calculated as the unweighted arithmetic mean across th
 
 ### 6.1 Why FedProx Does Not Neutralize Label Noise
 FedProx was originally designed to bound local model drift under statistical heterogeneity by penalizing $\frac{\mu}{2} \|\mathbf{w} - \mathbf{w}^t\|^2$. However:
-1. **Directional vs. Step-Size Error:** Under $40\%$ symmetric label noise, Client 5 computes cross-entropy gradients with respect to incorrect target classes. The proximal term penalizes the Euclidean distance $\|\mathbf{w}_5 - \mathbf{w}^t\|$, which moderates the magnitude of parameter movement, but does **not correct the erroneous directional orientation** of the gradient updates.
+1. **Directional Error vs. Parameter Deviation Penalty:** Under $40\%$ symmetric label noise, Client 5 computes cross-entropy gradients with respect to incorrect target classes. While the proximal penalty continuously penalizes parameter deviation from the global model ($\frac{\mu}{2} \|\mathbf{w}_5 - \mathbf{w}^t\|^2$), it penalizes displacement magnitude but does **not alter or correct the erroneous directional orientation** of the gradient updates.
 2. **Aggregated Impact:** When aggregated via sample weighting, Client 5's corrupted model delta is integrated into the global model proportionally to its sample count ($n_5 / N$), contaminating the global update regardless of the proximal penalty.
 
 ### 6.2 Update Cosine Similarities: Label Noise and Class Skew
@@ -198,7 +198,7 @@ Experiments were conducted on an AMD Ryzen 5 5600H processor configured for dual
 | **3407** | 54.70 min | 41.78 min | 96.52 min |
 | **7777** | 24.34 min | 24.49 min | 48.87 min |
 | **Total** | **214.30 min** | **257.41 min** | **471.71 min (~7.86 hrs)** |
-| **Mean** | **42.86 $\pm$ 16.03 min** | **51.48 $\pm$ 24.38 min** | **94.34 $\pm$ 26.54 min** |
+| **Mean** | **42.86 $\pm$ 16.08 min** | **51.48 $\pm$ 24.38 min** | **94.34 $\pm$ 26.54 min** |
 
 The algorithmic overhead of calculating proximal gradients added approximately $0.5\% - 7.1\%$ compute time during stable CPU power states. Variations between seeds reflect operating system power management and core frequency throttling across multi-hour background runs.
 
@@ -214,9 +214,9 @@ The algorithmic overhead of calculating proximal gradients added approximately $
 
 ## 9. Conclusion & Research Recommendations
 
-Across 300 communication rounds covering five random seeds on PathMNIST, **no statistically significant performance advantage was detected for FedProx ($\mu = 0.01$) over standard FedAvg** in the presence of Dirichlet non-IID partitioning and single-client symmetric label noise ($p = 0.469$).
+Across 300 communication rounds covering five random seeds on PathMNIST, **no statistically significant performance advantage was detected for FedProx ($\mu = 0.01$) over standard FedAvg** under Dirichlet non-IID partitioning and single-client symmetric label noise ($p = 0.469$). Because five seeds provide limited statistical power and no formal equivalence testing with predefined margins was conducted, this non-significant result does not establish statistical equivalence.
 
-For digital histopathology federated learning deployments facing label noise, algorithmic design must move beyond generic proximal drift penalties toward explicit noise-aware paradigms:
+Within the evaluated configuration (PathMNIST, simulated five-client federation, Dirichlet $\alpha = 0.3$, $40\%$ symmetric noise on Client 5, CompactPathCNN, and FedProx $\mu = 0.01$), proximal regularization alone did not overcome annotation noise. Future digital histopathology deployments confronting similar challenges should investigate explicit noise-aware paradigms:
 1. **Noise-Robust Loss Functions:** Integrating Generalized Cross-Entropy (GCE) or Symmetric Cross-Entropy (SCE) into local client objectives.
 2. **Adaptive Server Reweighting:** Applying cosine similarity filtering or client loss variance tracking to dynamically down-weight suspicious client updates during aggregation.
 3. **Loss-Based Sample Pruning:** Implementing small-loss sample selection algorithms locally prior to backward propagation.

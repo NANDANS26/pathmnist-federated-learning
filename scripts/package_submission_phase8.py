@@ -81,7 +81,7 @@ Federated learning (FL) enables decentralized participants to collaboratively tr
 
 In this work, we conduct a seed-controlled paired benchmark comparing Federated Averaging (**FedAvg**) against Federated Proximal Optimization (**FedProx**, proximal parameter $\\mu = 0.01$) across five canonical random seeds (42, 123, 2026, 3407, 7777). We evaluate on PathMNIST, a public 9-class colorectal histopathology dataset ($89,996$ training, $10,004$ validation, and $7,180$ test images), partitioned into five simulated federated clients using a Dirichlet distribution ($\\alpha = 0.3$). To assess resilience against annotation errors, Client 5 is subjected to exactly $40.00\\%$ symmetric label noise. Both algorithms were trained across 30 communication rounds using an identical 2-stage convolutional network (**CompactPathCNN**, 36,425 trainable parameters), identical seed-specific partitions, and identical initialization weights, totaling 300 executed communication rounds on an AMD Ryzen 5 5600H CPU execution platform.
 
-Over the five seeds, FedAvg achieved a mean held-out test accuracy of $68.880\\% \\pm 9.266\\text{ pp}$ (mean macro-F1: $0.6008 \\pm 0.0948$), while FedProx achieved $68.279\\% \\pm 8.551\\text{ pp}$ (mean macro-F1: $0.5934 \\pm 0.0960$), yielding a paired difference of $-0.602 \\pm 1.685\\text{ pp}$ in test accuracy ($t(4) = -0.7983$, two-sided $p = 0.46938$, 95% CI: $[-2.694\\text{ pp}, +1.491\\text{ pp}]$) and $-0.0075 \\pm 0.0105$ in macro-F1 ($t(4) = -1.5908$, $p = 0.18686$, 95% CI: $[-0.0205, +0.0056]$). Under the evaluated configuration, **no statistically significant difference in test performance was detected between FedAvg and FedProx across the five random seeds**. Because five seeds provide limited statistical power and no formal equivalence test with predefined equivalence margins was conducted, this non-significant result does not establish statistical equivalence. Mechanistically, the proximal penalty restricts the Euclidean step size of local parameter updates but does not alter the corrupted gradient directions induced by noisy annotations. Consequently, generic proximal drift penalties alone are insufficient to neutralize severe client-level label corruption in simulated histopathological federated learning without explicit noise filtering or adaptive client reweighting.
+Over the five seeds, FedAvg achieved a mean held-out test accuracy of $68.880\\% \\pm 9.266\\text{ pp}$ (mean macro-F1: $0.6008 \\pm 0.0948$), while FedProx achieved $68.279\\% \\pm 8.551\\text{ pp}$ (mean macro-F1: $0.5934 \\pm 0.0960$), yielding a paired difference of $-0.602 \\pm 1.685\\text{ pp}$ in test accuracy ($t(4) = -0.7983$, two-sided $p = 0.46938$, 95% CI: $[-2.694\\text{ pp}, +1.491\\text{ pp}]$) and $-0.0075 \\pm 0.0105$ in macro-F1 ($t(4) = -1.5908$, $p = 0.18686$, 95% CI: $[-0.0205, +0.0056]$). Under the evaluated configuration, **no statistically significant difference in test performance was detected between FedAvg and FedProx across the five random seeds**. Because five seeds provide limited statistical power and no formal equivalence test with predefined equivalence margins was conducted, this non-significant result does not establish statistical equivalence. Mechanistically, the proximal penalty penalizes parameter deviation from the global model but does not alter the corrupted gradient directions induced by noisy annotations. Consequently, under the evaluated configuration (PathMNIST, simulated five-client federation, Dirichlet $\\alpha = 0.3$, single-client $40\\%$ symmetric noise, CompactPathCNN, and FedProx $\\mu = 0.01$), proximal regularization alone did not overcome annotation noise without explicit noise filtering or adaptive client reweighting.
 
 ---
 
@@ -136,7 +136,7 @@ To enable computationally efficient federated optimization, we instantiated **Co
 - **Federated Averaging (FedAvg):** At communication round $t$, the server broadcasts global weights $\\mathbf{w}^t$. Each client $k$ minimizes local empirical cross-entropy loss $\\mathcal{L}_k(\\mathbf{w})$ over $E = 2$ epochs using SGD with batch size $B = 32$ and learning rate $\\eta = 0.01$. The server aggregates local weights via sample weighting: $\\mathbf{w}^{t+1} = \\sum_{k=1}^K \\frac{n_k}{N} \\mathbf{w}_k^{t, E}$.
 - **Federated Proximal Optimization (FedProx):** Adds a proximal regularization term to the local objective:
   $$\\min_{\\mathbf{w}} h_k(\\mathbf{w}; \\mathbf{w}^t) = \\mathcal{L}_k(\\mathbf{w}) + \\frac{\\mu}{2} \\|\\mathbf{w} - \\mathbf{w}^t\\|^2$$
-  Here $\\mu = 0.01$. The proximal term penalizes deviation from the global model during local optimization, pulling local updates toward $\\mathbf{w}^t$. Importantly, this term does not impose a hard bound on total parameter drift, but continuously scales the effective restoring force with Euclidean distance.
+  Here $\\mu = 0.01$. The proximal term penalizes deviation from the global model during local optimization, pulling local updates toward $\\mathbf{w}^t$. Importantly, this term does not impose a hard bound on parameter updates, but continuously penalizes parameter deviation from the global model with Euclidean distance.
 
 ---
 
@@ -184,7 +184,7 @@ We evaluated the null hypothesis $H_0: \\mu_{\\text{FedProx}} - \\mu_{\\text{Fed
    - Mean Paired Difference: $\\bar{d} = -0.520\\text{ pp}$ ($s_d = 0.166\\text{ pp}$, $\\text{SE} = 0.074\\text{ pp}$)
    - Paired Student-$t$ Statistic: $t(4) = -7.0096$, $p = 0.00218$
    - $95\\%$ Confidence Interval: $[-0.726\\text{ pp}, -0.314\\text{ pp}]$
-   - *Interpretation:* Peak global validation accuracy was consistently slightly higher for FedAvg across all five seeds ($0.27$ to $0.68\\text{ pp}$ advantage), reflecting the slight regularizing drag imposed by the proximal term $\\mu = 0.01$ on clean client optimization.
+   - *Interpretation:* Peak global validation accuracy was slightly higher for FedAvg across all five seeds (mean difference $-0.520 \\pm 0.166\\text{ pp}$, ranging from $0.27$ to $0.68\\text{ pp}$ advantage, paired $t(4) = -7.0096, p = 0.00218$). We report this empirical difference directly, without asserting an unsupported causal claim that the proximal term caused this difference.
 
 5. **Test Loss:**
    - FedAvg Mean = $0.9082 \\pm 0.1897$; FedProx Mean = $0.9239 \\pm 0.1877$
@@ -245,7 +245,7 @@ Per-class F1 metrics were calculated as the unweighted arithmetic mean across th
 
 ### 6.1 Why FedProx Does Not Neutralize Label Noise
 FedProx was originally designed to bound local model drift under statistical heterogeneity by penalizing $\\frac{\\mu}{2} \\|\\mathbf{w} - \\mathbf{w}^t\\|^2$. However:
-1. **Directional vs. Step-Size Error:** Under $40\\%$ symmetric label noise, Client 5 computes cross-entropy gradients with respect to incorrect target classes. The proximal term penalizes the Euclidean distance $\\|\\mathbf{w}_5 - \\mathbf{w}^t\\|$, which moderates the magnitude of parameter movement, but does **not correct the erroneous directional orientation** of the gradient updates.
+1. **Directional Error vs. Parameter Deviation Penalty:** Under $40\\%$ symmetric label noise, Client 5 computes cross-entropy gradients with respect to incorrect target classes. While the proximal penalty continuously penalizes parameter deviation from the global model ($\\frac{\\mu}{2} \\|\\mathbf{w}_5 - \\mathbf{w}^t\\|^2$), it penalizes displacement magnitude but does **not alter or correct the erroneous directional orientation** of the gradient updates.
 2. **Aggregated Impact:** When aggregated via sample weighting, Client 5's corrupted model delta is integrated into the global model proportionally to its sample count ($n_5 / N$), contaminating the global update regardless of the proximal penalty.
 
 ### 6.2 Update Cosine Similarities: Label Noise and Class Skew
@@ -265,7 +265,7 @@ Experiments were conducted on an AMD Ryzen 5 5600H processor configured for dual
 | **3407** | 54.70 min | 41.78 min | 96.52 min |
 | **7777** | 24.34 min | 24.49 min | 48.87 min |
 | **Total** | **214.30 min** | **257.41 min** | **471.71 min (~7.86 hrs)** |
-| **Mean** | **42.86 $\\pm$ 16.03 min** | **51.48 $\\pm$ 24.38 min** | **94.34 $\\pm$ 26.54 min** |
+| **Mean** | **42.86 $\\pm$ 16.08 min** | **51.48 $\\pm$ 24.38 min** | **94.34 $\\pm$ 26.54 min** |
 
 The algorithmic overhead of calculating proximal gradients added approximately $0.5\\% - 7.1\\%$ compute time during stable CPU power states. Variations between seeds reflect operating system power management and core frequency throttling across multi-hour background runs.
 
@@ -281,9 +281,9 @@ The algorithmic overhead of calculating proximal gradients added approximately $
 
 ## 9. Conclusion & Research Recommendations
 
-Across 300 communication rounds covering five random seeds on PathMNIST, **no statistically significant performance advantage was detected for FedProx ($\\mu = 0.01$) over standard FedAvg** in the presence of Dirichlet non-IID partitioning and single-client symmetric label noise ($p = 0.469$).
+Across 300 communication rounds covering five random seeds on PathMNIST, **no statistically significant performance advantage was detected for FedProx ($\\mu = 0.01$) over standard FedAvg** under Dirichlet non-IID partitioning and single-client symmetric label noise ($p = 0.469$). Because five seeds provide limited statistical power and no formal equivalence testing with predefined margins was conducted, this non-significant result does not establish statistical equivalence.
 
-For digital histopathology federated learning deployments facing label noise, algorithmic design must move beyond generic proximal drift penalties toward explicit noise-aware paradigms:
+Within the evaluated configuration (PathMNIST, simulated five-client federation, Dirichlet $\\alpha = 0.3$, $40\\%$ symmetric noise on Client 5, CompactPathCNN, and FedProx $\\mu = 0.01$), proximal regularization alone did not overcome annotation noise. Future digital histopathology deployments confronting similar challenges should investigate explicit noise-aware paradigms:
 1. **Noise-Robust Loss Functions:** Integrating Generalized Cross-Entropy (GCE) or Symmetric Cross-Entropy (SCE) into local client objectives.
 2. **Adaptive Server Reweighting:** Applying cosine similarity filtering or client loss variance tracking to dynamically down-weight suspicious client updates during aggregation.
 3. **Loss-Based Sample Pruning:** Implementing small-loss sample selection algorithms locally prior to backward propagation.
@@ -388,7 +388,7 @@ hr {{ border: none; border-top: 1px solid #cbd5e1; margin: 16px 0; }}
     <br><br>
     In this work, we conduct a seed-controlled paired benchmark comparing Federated Averaging (<strong>FedAvg</strong>) against Federated Proximal Optimization (<strong>FedProx</strong>, &mu; = 0.01) across five canonical random seeds (42, 123, 2026, 3407, 7777). We evaluate on PathMNIST, a public 9-class colorectal histopathology dataset (89,996 training, 10,004 validation, and 7,180 test images), partitioned into five simulated federated clients using a Dirichlet distribution (&alpha; = 0.3). To assess resilience against annotation errors, Client 5 is subjected to exactly 40.00% symmetric label noise. Both algorithms were trained across 30 communication rounds using an identical 2-stage convolutional network (<strong>CompactPathCNN</strong>, 36,425 trainable parameters), identical seed-specific partitions, and identical initialization weights, totaling 300 executed communication rounds on an AMD Ryzen 5 5600H CPU execution platform.
     <br><br>
-    Over the five seeds, FedAvg achieved a mean held-out test accuracy of 68.880% &plusmn; 9.266 pp (mean macro-F1: 0.6008 &plusmn; 0.0948), while FedProx achieved 68.279% &plusmn; 8.551 pp (mean macro-F1: 0.5934 &plusmn; 0.0960), yielding a paired difference of -0.602 &plusmn; 1.685 pp in test accuracy (t(4) = -0.7983, two-sided p = 0.46938, 95% CI: [-2.694 pp, +1.491 pp]) and -0.0075 &plusmn; 0.0105 in macro-F1 (t(4) = -1.5908, p = 0.18686, 95% CI: [-0.0205, +0.0056]). Under the evaluated configuration, <strong>no statistically significant difference in test performance was detected between FedAvg and FedProx across the five random seeds</strong>. Because five seeds provide limited statistical power and no formal equivalence test with predefined equivalence margins was conducted, this non-significant result does not establish statistical equivalence. Mechanistically, the proximal penalty restricts the Euclidean step size of local parameter updates but does not alter the corrupted gradient directions induced by noisy annotations. Consequently, generic proximal drift penalties alone are insufficient to neutralize severe client-level label corruption in simulated histopathological federated learning without explicit noise filtering or adaptive client reweighting.
+    Over the five seeds, FedAvg achieved a mean held-out test accuracy of 68.880% &plusmn; 9.266 pp (mean macro-F1: 0.6008 &plusmn; 0.0948), while FedProx achieved 68.279% &plusmn; 8.551 pp (mean macro-F1: 0.5934 &plusmn; 0.0960), yielding a paired difference of -0.602 &plusmn; 1.685 pp in test accuracy (t(4) = -0.7983, two-sided p = 0.46938, 95% CI: [-2.694 pp, +1.491 pp]) and -0.0075 &plusmn; 0.0105 in macro-F1 (t(4) = -1.5908, p = 0.18686, 95% CI: [-0.0205, +0.0056]). Under the evaluated configuration, <strong>no statistically significant difference in test performance was detected between FedAvg and FedProx across the five random seeds</strong>. Because five seeds provide limited statistical power and no formal equivalence test with predefined equivalence margins was conducted, this non-significant result does not establish statistical equivalence. Mechanistically, the proximal penalty penalizes parameter deviation from the global model but does not alter the corrupted gradient directions induced by noisy annotations. Consequently, under the evaluated configuration (PathMNIST, simulated five-client federation, Dirichlet &alpha; = 0.3, single-client 40% symmetric noise, CompactPathCNN, and FedProx &mu; = 0.01), proximal regularization alone did not overcome annotation noise without explicit noise filtering or adaptive client reweighting.
 </div>
 
 <h2>1. Introduction & Research Scope</h2>
@@ -432,7 +432,7 @@ hr {{ border: none; border-top: 1px solid #cbd5e1; margin: 16px 0; }}
 <ul>
     <li><strong>Test Accuracy:</strong> Mean Paired Difference = -0.602 pp (&plusmn;1.685 pp). Paired t(4) = -0.7983, p = 0.46938 (two-sided, fail to reject H<sub>0</sub>). 95% Confidence Interval: [-2.694 pp, +1.491 pp]. Wilcoxon signed-rank W = 7.0, p = 1.000.</li>
     <li><strong>Test Macro-F1:</strong> Mean Paired Difference = -0.0075 (&plusmn;0.0105). Paired t(4) = -1.5908, p = 0.18686. 95% CI: [-0.0205, +0.0056]. Wilcoxon signed-rank W = 1.0, p = 0.125.</li>
-    <li><strong>Best Validation Accuracy:</strong> Mean Difference = -0.520 pp (&plusmn;0.166 pp). Paired t(4) = -7.0096, p = 0.00218. 95% CI: [-0.726 pp, -0.314 pp]. FedAvg showed a consistent slight peak validation advantage across all partitions due to proximal regularization drag on clean clients.</li>
+    <li><strong>Best Validation Accuracy:</strong> Mean Difference = -0.520 pp (&plusmn;0.166 pp). Paired t(4) = -7.0096, p = 0.00218. 95% CI: [-0.726 pp, -0.314 pp]. Peak validation accuracy was slightly higher for FedAvg across all partitions (-0.520 &plusmn; 0.166 pp); we report this empirical difference directly without asserting an unsupported causal claim.</li>
     <li><strong>Test Loss:</strong> FedAvg Mean = 0.9082 &plusmn; 0.1897; FedProx Mean = 0.9239 &plusmn; 0.1877 (Paired &Delta; = +0.0156 &plusmn; 0.0407, t(4) = 0.8566, p = 0.43994).</li>
 </ul>
 
@@ -458,14 +458,14 @@ hr {{ border: none; border-top: 1px solid #cbd5e1; margin: 16px 0; }}
 </div>
 
 <h2>5. Scientific Interpretation & Update Dynamics</h2>
-<p><strong>Why Proximal Regularization Does Not Neutralize Label Corruption:</strong> FedProx's proximal term &mu;/2 ||w - w<sup>t</sup>||<sup>2</sup> penalizes parameter divergence from the global model. While this restricts the Euclidean step size of local client training, it <em>does not alter the corrupted gradient directions</em> induced by mislabeled samples. When aggregated via sample weighting, Client 5's contaminated model update still enters the global consensus proportionally to its sample count.</p>
+<p><strong>Why Proximal Regularization Does Not Neutralize Label Corruption:</strong> FedProx's proximal term &mu;/2 ||w - w<sup>t</sup>||<sup>2</sup> continuously penalizes parameter deviation from the global model. While this penalizes deviation magnitude, it <em>does not alter the corrupted gradient directions</em> induced by mislabeled samples. When aggregated via sample weighting, Client 5's contaminated model update still enters the global consensus proportionally to its sample count.</p>
 <p><strong>Update Cosine Similarities:</strong> Negative client-update cosine similarities were observed between Client 5 and clean clients. However, label noise cannot be claimed as the sole cause: Dirichlet label skew (&alpha; = 0.3) creates severe client-level class imbalance, which independently produces orthogonal or divergent gradient vectors across clients. Both factors jointly contribute.</p>
 
 <h2>6. Hardware Telemetry & Runtime</h2>
-<p>The entire federated training pipeline ran on the CPU (AMD Ryzen 5 5600H, 2 threads). While CUDA diagnostics were confirmed during pre-flight, GPU compute was not used for training. Total compute across 300 rounds was 471.7 minutes (~7.86 hours): FedAvg averaged 42.86 &plusmn; 16.03 min/seed; FedProx averaged 51.48 &plusmn; 24.38 min/seed.</p>
+<p>The entire federated training pipeline ran on the CPU (AMD Ryzen 5 5600H, 2 threads). While CUDA diagnostics were confirmed during pre-flight, GPU compute was not used for training. Total compute across 300 rounds was 471.7 minutes (~7.86 hours): FedAvg averaged 42.86 &plusmn; 16.08 min/seed; FedProx averaged 51.48 &plusmn; 24.38 min/seed.</p>
 
 <h2>7. Conclusion & Recommendations</h2>
-<p>Under non-IID partitioning (&alpha; = 0.3) and 40% single-client label noise on PathMNIST, <strong>no statistically significant difference in test performance was detected between FedAvg and FedProx across five random seeds (p = 0.469)</strong>. Future work must integrate explicit noise-aware defenses, such as Generalized Cross-Entropy loss or cosine similarity-based client reweighting.</p>
+<p>Under non-IID partitioning (&alpha; = 0.3) and 40% single-client label noise on PathMNIST with CompactPathCNN and FedProx &mu; = 0.01, <strong>no statistically significant difference in test performance was detected between FedAvg and FedProx across five random seeds (p = 0.469)</strong>. Because five seeds provide limited statistical power and no formal equivalence testing was conducted, this does not establish statistical equivalence. In this setting, proximal regularization alone did not overcome annotation noise, motivating explicit noise-aware defenses (e.g., Generalized Cross-Entropy loss or cosine similarity-based client reweighting).</p>
 
 <h2>References</h2>
 <ol>
@@ -522,8 +522,9 @@ Federated Learning (FL) enables decentralized training of diagnostic medical ima
 
 ### 4. Statistical Interpretation & Core Conclusion
 - **Statistical Interpretation:** **No statistically significant difference in test performance was detected between FedAvg and FedProx across the five random seeds ($p = 0.469$).** Because five seeds provide limited statistical power and no predefined equivalence testing was performed, this lack of statistical significance does not prove equivalence.
-- **Why FedProx Does Not Neutralize Noise:** The proximal penalty $\\frac{\\mu}{2}\\|\\mathbf{w}-\\mathbf{w}^t\\|^2$ penalizes the magnitude of parameter drift but cannot rectify corrupted gradient directions induced by noisy annotations. Client 5's corrupted updates still contaminate global aggregation proportionally to its sample weight.
-- **Main Conclusion:** Generic proximal regularization is insufficient to defend federated medical models against corrupted local annotators. Robust federated histopathology requires explicit noise filtering, robust loss functions (e.g., Generalized Cross-Entropy), or dynamic server-side update reweighting based on cosine similarity.
+- **Parameter Deviation Penalty vs. Noise Orientation:** The proximal penalty $\\frac{\\mu}{2}\\|\\mathbf{w}-\\mathbf{w}^t\\|^2$ penalizes parameter deviation from the global model but cannot rectify corrupted gradient directions induced by noisy annotations. Client 5's corrupted updates still contaminate global aggregation proportionally to its sample weight.
+- **Observed Peak Validation Difference:** Peak validation accuracy was slightly higher for FedAvg across all five seeds (mean difference $-0.520 \\pm 0.166\\text{ pp}$, $p = 0.0022$); we report this empirical observation directly without asserting an unsupported causal claim.
+- **Bounded Conclusion:** Within the evaluated configuration (PathMNIST, simulated 5 clients, Dirichlet $\\alpha = 0.3$, single-client $40\\%$ symmetric noise, CompactPathCNN, and FedProx $\\mu = 0.01$), proximal regularization did not yield generalization benefits over FedAvg. Defending against annotation noise under these conditions motivates exploring explicit noise-aware paradigms (e.g., Generalized Cross-Entropy or adaptive server-side reweighting).
 """
     with open(summary_md_path, "w", encoding="utf-8") as f:
         f.write(summary_md_content)
@@ -735,9 +736,9 @@ li {
 
 <h2>4. Core Insights & Research Recommendations</h2>
 <ul>
-    <li><strong>Symmetric Noise vs. Proximal Drift:</strong> FedProx penalizes the Euclidean step size ||w - w<sup>t</sup>||<sup>2</sup> but does <em>not</em> correct corrupted gradient orientations induced by mislabeled samples. Client 5's corrupted update is still integrated proportionally into the global model during sample-weighted aggregation.</li>
-    <li><strong>Regularization Drag:</strong> Peak validation accuracy favored FedAvg by -0.52 pp (p = 0.0022), indicating that proximal penalty slightly impedes clean client adaptation in 9-class histopathology.</li>
-    <li><strong>Research Recommendation:</strong> Generic proximal regularization is insufficient to counter client-level label noise in federated histopathology. Practical systems require noise-robust losses (e.g., GCE, SCE), client cosine similarity filtering, or loss-based local sample pruning.</li>
+    <li><strong>Symmetric Noise vs. Proximal Penalty:</strong> FedProx penalizes parameter deviation from the global model (&mu;/2 ||w - w<sup>t</sup>||<sup>2</sup>) but does <em>not</em> correct corrupted gradient orientations induced by mislabeled samples. Client 5's corrupted update is still integrated proportionally into the global model during sample-weighted aggregation.</li>
+    <li><strong>Peak Validation Accuracy:</strong> Peak validation accuracy favored FedAvg by -0.52 pp (p = 0.0022 across 5 seeds); we report this empirical difference directly without asserting an unsupported causal claim.</li>
+    <li><strong>Bounded Finding:</strong> Within the evaluated configuration (PathMNIST, 5 clients, &alpha;=0.3, Client 5 40% noise, CompactPathCNN, FedProx &mu;=0.01), proximal regularization did not yield generalization benefits over FedAvg. Defending against label noise motivates investigating explicit noise-aware paradigms (e.g., robust losses, cosine filtering, or local sample pruning).</li>
 </ul>
 
 <div class="footer">
@@ -801,27 +802,46 @@ OPAL operationalizes an observe-reason-rewrite loop during a single neural netwo
 
 ## 3. Key Empirical Benchmarks Reported by the Authors
 
-The preprint evaluates OPAL across several controlled stress tests:
+The preprint evaluates OPAL across distinct, controlled stress tests on CIFAR-10, which must be clearly separated:
 
-1. **CIFAR-10 Synthetic Data Corruption & Mislabeled Data:**
-   - On a ResNet-18 trained on CIFAR-10 with $10\\%$ corrupted training labels, the reactive agent independently detected loss divergence and synthesized gradient clipping and loss-damping update rules that mitigated label memorization, outperforming unadjusted baseline recipes.
-   - Under stress tests where bursts of completely randomized images and labels were injected mid-training, the agent adapted its learning rate schedule and momentum dampening to absorb the shock without terminal divergence.
-2. **Overfitting Experiments:**
-   - In tasks with limited training data, the agent autonomously tracked the widening train-validation generalization gap and introduced adaptive weight-decay and learning rate moderation to curb overfitting.
-3. **Wall-Clock Overhead & Resource Consumption:**
-   - The primary computational overhead arises from LLM API inference calls during agent reflection steps. While standard PyTorch backward passes execute at native hardware speed, agent invocations add latency depending on API call frequency and context window length. The authors recommend triggering reflection at sparse intervals (e.g., every 50–100 steps or upon metric threshold triggers) to keep relative wall-clock overhead manageable.
+### A. Data Corruption Shock Experiment (CIFAR-10)
+- **Experimental Protocol:** Training was subjected to four separate episodes of synthetic data corruption consisting of completely random images and random labels.
+- **Initial Shock:** The first two corruption episodes caused catastrophic test accuracy drops of **50 percentage points** and **66 percentage points**, respectively.
+- **Agent Interventions:** In response to real-time telemetry, OPAL iteratively synthesized defense mechanisms directly into the optimizer code:
+  1. Loss damping;
+  2. Gradient and update clipping;
+  3. A batch-loss gating mechanism that suppressed parameter updates when batch loss surged abnormally.
+- **Outcome:** Across the subsequent two corruption episodes, accuracy drops were suppressed to **12 percentage points** and **0 percentage points** (fully absorbing the shock). In contrast, static baseline optimizers continued to suffer substantial, unmitigated accuracy drops across all episodes.
+
+### B. Overfitting Mitigation Experiment (ResNet-18 on Corrupted CIFAR-10)
+- **Experimental Protocol:** A separate ResNet-18 experiment on CIFAR-10 with **10% incorrectly labelled training samples**.
+- **Agent Interventions:** To prevent the model from memorizing noisy annotations as the train-validation gap widened, OPAL synthesized an adaptive strategy utilizing:
+  1. Progressively higher learning rates;
+  2. Extended stochastic weight averaging (SWA).
+  *(Note: Weight decay was not established by the primary source as the mechanism for this specific overfitting intervention).*
+- **Generalization Performance:** OPAL achieved a final test accuracy of **78.6%**, compared to **73.5%** for the baseline AdamW final weights.
+- **Evaluation Integrity:** Crucially, the agent **did not use the test set** to make its optimization decisions; all interventions were guided strictly by training trajectory telemetry and validation metrics.
 
 ---
 
-## 4. Reproducibility & Theoretical Limitations
+## 4. Wall-Clock Overhead & Resource Consumption
 
-1. **Non-Deterministic Optimization Trajectories:** Because LLM generation is inherently stochastic, independent runs may synthesize different optimizer code mutations, presenting fundamental challenges for bitwise scientific reproducibility unless all prompts and generated code snippets are logged deterministically.
-2. **Absence of Convergence Guarantees:** Classical convergence proofs (e.g., $L$-smooth non-convex convergence for SGD or Adam) rely on invariant update rules. Dynamically mutating the optimization function mid-trajectory invalidates standard convergence assumptions.
-3. **API Dependency & Compute Cost:** Relying on proprietary LLM APIs introduces external network dependencies and variable token pricing into the core training loop.
+The empirical computational overhead of OPAL depends on whether the agent loop operates synchronously or asynchronously:
+- **Asynchronous Execution (Non-blocking):** When training continues concurrently while the LLM agent reasons in the background, the wall-clock overhead is **1.01×–1.14×** relative to baseline training.
+- **Synchronous Execution (Blocking):** When training halts and waits for agent decisions and code generation at each reflection point, wall-clock overhead increases to **1.30×–4.39×**.
 
 ---
 
-## 5. Distinction from the PathMNIST Federated Learning Study
+## 5. Implementation Limitations & Theoretical Constraints
+
+1. **Sharded Training Constraints:** Modern large-scale training frameworks (e.g., PyTorch FSDP, DeepSpeed ZeRO, Megatron-LM) shard optimizer states, momentum buffers, and model parameters across multiple GPUs and nodes. Dynamically modifying Python optimizer update logic mid-run across distributed, sharded C++/CUDA execution backends presents severe state synchronization challenges that OPAL does not currently resolve.
+2. **Optimizer Compilation Incompatibility:** Modern high-performance training relies heavily on static graph capture and JIT compilation (e.g., `torch.compile`, Triton kernels, CUDA graphs). Compilers require static execution graphs; dynamically injecting arbitrary Python source code into the inner optimization loop breaks execution graphs, triggering continuous recompilation, graph breaks, and substantial deoptimization penalties.
+3. **Stochastic Optimization Trajectories:** Because LLM generation is inherently non-deterministic, independent training runs with OPAL may synthesize divergent optimizer updates, compromising bitwise experimental reproducibility unless every prompt, completion, and mutated AST is logged deterministically.
+4. **Lack of Theoretical Convergence Guarantees:** Classical non-convex optimization theory assumes invariant algorithmic update rules. Mid-trajectory code mutation invalidates standard Lyapunov and descent lemma proofs.
+
+---
+
+## 6. Distinction from the PathMNIST Federated Learning Study
 
 It is essential to distinguish the scope and methodology of Bai et al. from our PathMNIST experimental benchmark:
 - **Centralized vs. Federated:** OPAL is designed for a single centralized model where a central agent modifies local step code. Our PathMNIST study investigates decentralized federated learning across 5 distributed client nodes with sample-weighted aggregation.
@@ -863,10 +883,10 @@ In accordance with Phase 8 Non-Negotiable Constraint #0 (*"Do not fabricate miss
     print(f"Saved: {ro_req_path}")
 
     # -------------------------------------------------------------------------
-    # D. PHASE 8.1 RELEASE REPORT
+    # D. PHASE 8.2 FINAL RELEASE REPORT
     # -------------------------------------------------------------------------
     p81_rep_path = os.path.join(SUBMISSION_DIR, "PHASE_8_FINAL_RELEASE_REPORT.md")
-    p81_content = """# Phase 8.1 — Final Scientific Consistency & Release Report
+    p81_content = """# Phase 8.2 — Final Scientific Consistency & Release Report
 
 **Author / Operator:** Antigravity Autonomous Agent (Google DeepMind Advanced Agentic Coding)  
 **Academic Oversight:** Dr. Sachin D N, Assistant Professor, IIIT Bhopal  
@@ -879,7 +899,7 @@ In accordance with Phase 8 Non-Negotiable Constraint #0 (*"Do not fabricate miss
 
 ## 1. Summary of Scientific & Statistical Consistency Corrections
 
-Phase 8.1 successfully resolved all outstanding textual, statistical, and terminological discrepancies:
+Phase 8.2 successfully incorporated the final scientific and literature corrections across all deliverables:
 
 1. **Exact Unrounded Sample Statistics (ddof=1):**
    - **Test Accuracy:**
@@ -898,35 +918,42 @@ Phase 8.1 successfully resolved all outstanding textual, statistical, and termin
      - FedAvg: Mean = $65.986\\%$, Sample SD = **$4.292\\text{ pp}$**
      - FedProx: Mean = $65.466\\%$, Sample SD = **$4.420\\text{ pp}$**
      - Paired Difference: **$-0.520 \\pm 0.166\\text{ pp}$** ($t(4) = -7.0096$, $p = 0.00218$, 95% CI: $[-0.726\\text{ pp}, -0.314\\text{ pp}]$)
+     - *Empirical Difference:* Reported directly without asserting unsupported causal claims.
    - **Test Loss:**
      - FedAvg: Mean = $0.9082 \\pm 0.1897$; FedProx: Mean = $0.9239 \\pm 0.1877$
      - Paired Difference: **$+0.0156 \\pm 0.0407$** ($t(4) = 0.8566$, $p = 0.43994$)
+   - **Wall-Clock Compute Time:**
+     - FedAvg: $42.86 \\pm 16.08\\text{ min/seed}$; FedProx: $51.48 \\pm 24.38\\text{ min/seed}$; Total: $471.7\\text{ min}$.
 
 2. **Terminology & Abbreviation Corrections:**
    - Replaced "adversarial annotation noise" with "40% symmetric label noise".
    - Corrected PathMNIST Class 1 abbreviation from `COL` to **`BACK`** (Background).
    - Replaced "bit-deterministic benchmark" with **"seed-controlled paired benchmark"**.
 
-3. **Scientific Scope Boundaries:**
+3. **Appropriately Scoped Scientific Claims:**
    - Clarified that PathMNIST is a public benchmark partitioned into simulated federated clients (no real multi-hospital federation was conducted).
    - Clarified that differential privacy was not evaluated.
-   - Bounded FedProx conclusions strictly to the tested $\\mu = 0.01$ configuration, CompactPathCNN architecture, PathMNIST dataset, and single-client noise setting.
-   - Documented that negative cosine similarities reflect both label noise and Dirichlet class distribution skew ($\alpha = 0.3$).
+   - Replaced broad claims about generic proximal regularization with conclusions strictly limited to: PathMNIST, simulated five-client federation, Dirichlet $\\alpha = 0.3$, $40\\%$ symmetric noise on Client 5, CompactPathCNN, and FedProx $\\mu = 0.01$.
+   - Explicitly highlighted that lack of statistical significance ($p = 0.469$) does not establish statistical equivalence due to sample size ($N=5$) and absence of predefined equivalence testing.
+   - Replaced wording implying hard-bounding of Euclidean step size with precise phrasing that the proximal term continuously penalizes parameter deviation from the global model.
+   - Avoided causal attribution for the peak validation difference between algorithms.
 
 4. **Reactive Optimizers Literature Review (arXiv:2610.33826):**
-   - Correctly classified as an **unrefereed arXiv preprint** (not peer-reviewed).
-   - Qualified code execution claims (assertion testing, but no formal sandboxing or convergence guarantees).
-   - Documented key empirical findings: CIFAR-10 10% label corruption test, random image/label shock tests, overfitting mitigation, and LLM API wall-clock overhead.
-   - Clearly separated OPAL's centralized dynamic agent setting from our decentralized federated learning benchmark.
+   - Retained unrefereed arXiv preprint classification.
+   - Distinctly separated the two CIFAR-10 experiments:
+     - **Data Corruption Shock:** 4 episodes of random images/labels; drops of 50 and 66 pp in episodes 1-2; OPAL synthesized loss damping, clipping, then batch-loss gate; subsequent drops reduced to 12 and 0 pp; static baselines continued substantial drops.
+     - **Overfitting Mitigation:** ResNet-18 on CIFAR-10 with 10% mislabeled samples; OPAL used progressively higher learning rates and extended stochastic weight averaging; test accuracy: OPAL 78.6% vs. AdamW 73.5%; agent did not access or evaluate on the test set; no claim of weight decay made.
+   - Documented empirical wall-clock overhead: **1.01×–1.14×** asynchronous (non-blocking), **1.30×–4.39×** synchronous (blocking).
+   - Documented implementation limitations around sharded training (FSDP/DDP) and optimizer compilation (`torch.compile`).
    - Retained the source availability notice.
 
 5. **PDF Deliverables Regenerated:**
-   - `submission/PathMNIST_Federated_Learning_Final_Report.pdf` (6 pages, 1.5 MB).
-   - `submission/PathMNIST_Federated_Learning_One_Page_Summary.pdf` (**strictly 1 page**, removed stale Git commit SHA from footer).
+   - `submission/PathMNIST_Federated_Learning_Final_Report.pdf` (6 pages, ~1.5 MB).
+   - `submission/PathMNIST_Federated_Learning_One_Page_Summary.pdf` (**strictly 1 page A4**, verified via Chromium engine).
    - All figures synchronized across `reports/figures/` and `submission/figures/`.
 
 6. **Weights & Biases Status:**
-   - Clearly recorded as **PENDING USER AUTHENTICATION** (no API key configured locally).
+   - Recorded as **PENDING USER AUTHENTICATION** (runs tracked locally offline).
    - Provided non-destructive script `scripts/publish_to_wandb.py` and instructions.
 
 ---
@@ -944,7 +971,7 @@ Phase 8.1 successfully resolved all outstanding textual, statistical, and termin
 | **W&B Guide & Non-Destructive Script** | `submission/WANDB_PUBLICATION_REQUIRED.md` & `scripts/publish_to_wandb.py` | **COMPLETE** |
 | **Exact Sample Statistics (ddof=1)** | Synchronized across Markdown, PDF, CSV, JSON, and Figures | **COMPLETE** |
 | **Corrected Terminology** | 40% symmetric noise, BACK abbreviation, seed-controlled benchmark | **COMPLETE** |
-| **Bounded Scientific Scope** | Simulated federation, no DP, bounded FedProx conclusions | **COMPLETE** |
+| **Scoped Scientific Claims** | Bounded to evaluated setting, non-equivalence clarified, non-causal val peak | **COMPLETE** |
 | **Git Release & Upstream Push** | Main branch pushed to GitHub | **EXECUTED / VERIFIED** |
 | **W&B Cloud Sync** | Requires user local API key entry (`wandb login`) | **PENDING USER ACTION** |
 """

@@ -33,27 +33,46 @@ OPAL operationalizes an observe-reason-rewrite loop during a single neural netwo
 
 ## 3. Key Empirical Benchmarks Reported by the Authors
 
-The preprint evaluates OPAL across several controlled stress tests:
+The preprint evaluates OPAL across distinct, controlled stress tests on CIFAR-10, which must be clearly separated:
 
-1. **CIFAR-10 Synthetic Data Corruption & Mislabeled Data:**
-   - On a ResNet-18 trained on CIFAR-10 with $10\%$ corrupted training labels, the reactive agent independently detected loss divergence and synthesized gradient clipping and loss-damping update rules that mitigated label memorization, outperforming unadjusted baseline recipes.
-   - Under stress tests where bursts of completely randomized images and labels were injected mid-training, the agent adapted its learning rate schedule and momentum dampening to absorb the shock without terminal divergence.
-2. **Overfitting Experiments:**
-   - In tasks with limited training data, the agent autonomously tracked the widening train-validation generalization gap and introduced adaptive weight-decay and learning rate moderation to curb overfitting.
-3. **Wall-Clock Overhead & Resource Consumption:**
-   - The primary computational overhead arises from LLM API inference calls during agent reflection steps. While standard PyTorch backward passes execute at native hardware speed, agent invocations add latency depending on API call frequency and context window length. The authors recommend triggering reflection at sparse intervals (e.g., every 50–100 steps or upon metric threshold triggers) to keep relative wall-clock overhead manageable.
+### A. Data Corruption Shock Experiment (CIFAR-10)
+- **Experimental Protocol:** Training was subjected to four separate episodes of synthetic data corruption consisting of completely random images and random labels.
+- **Initial Shock:** The first two corruption episodes caused catastrophic test accuracy drops of **50 percentage points** and **66 percentage points**, respectively.
+- **Agent Interventions:** In response to real-time telemetry, OPAL iteratively synthesized defense mechanisms directly into the optimizer code:
+  1. Loss damping;
+  2. Gradient and update clipping;
+  3. A batch-loss gating mechanism that suppressed parameter updates when batch loss surged abnormally.
+- **Outcome:** Across the subsequent two corruption episodes, accuracy drops were suppressed to **12 percentage points** and **0 percentage points** (fully absorbing the shock). In contrast, static baseline optimizers continued to suffer substantial, unmitigated accuracy drops across all episodes.
+
+### B. Overfitting Mitigation Experiment (ResNet-18 on Corrupted CIFAR-10)
+- **Experimental Protocol:** A separate ResNet-18 experiment on CIFAR-10 with **10% incorrectly labelled training samples**.
+- **Agent Interventions:** To prevent the model from memorizing noisy annotations as the train-validation gap widened, OPAL synthesized an adaptive strategy utilizing:
+  1. Progressively higher learning rates;
+  2. Extended stochastic weight averaging (SWA).
+  *(Note: Weight decay was not established by the primary source as the mechanism for this specific overfitting intervention).*
+- **Generalization Performance:** OPAL achieved a final test accuracy of **78.6%**, compared to **73.5%** for the baseline AdamW final weights.
+- **Evaluation Integrity:** Crucially, the agent **did not use the test set** to make its optimization decisions; all interventions were guided strictly by training trajectory telemetry and validation metrics.
 
 ---
 
-## 4. Reproducibility & Theoretical Limitations
+## 4. Wall-Clock Overhead & Resource Consumption
 
-1. **Non-Deterministic Optimization Trajectories:** Because LLM generation is inherently stochastic, independent runs may synthesize different optimizer code mutations, presenting fundamental challenges for bitwise scientific reproducibility unless all prompts and generated code snippets are logged deterministically.
-2. **Absence of Convergence Guarantees:** Classical convergence proofs (e.g., $L$-smooth non-convex convergence for SGD or Adam) rely on invariant update rules. Dynamically mutating the optimization function mid-trajectory invalidates standard convergence assumptions.
-3. **API Dependency & Compute Cost:** Relying on proprietary LLM APIs introduces external network dependencies and variable token pricing into the core training loop.
+The empirical computational overhead of OPAL depends on whether the agent loop operates synchronously or asynchronously:
+- **Asynchronous Execution (Non-blocking):** When training continues concurrently while the LLM agent reasons in the background, the wall-clock overhead is **1.01×–1.14×** relative to baseline training.
+- **Synchronous Execution (Blocking):** When training halts and waits for agent decisions and code generation at each reflection point, wall-clock overhead increases to **1.30×–4.39×**.
 
 ---
 
-## 5. Distinction from the PathMNIST Federated Learning Study
+## 5. Implementation Limitations & Theoretical Constraints
+
+1. **Sharded Training Constraints:** Modern large-scale training frameworks (e.g., PyTorch FSDP, DeepSpeed ZeRO, Megatron-LM) shard optimizer states, momentum buffers, and model parameters across multiple GPUs and nodes. Dynamically modifying Python optimizer update logic mid-run across distributed, sharded C++/CUDA execution backends presents severe state synchronization challenges that OPAL does not currently resolve.
+2. **Optimizer Compilation Incompatibility:** Modern high-performance training relies heavily on static graph capture and JIT compilation (e.g., `torch.compile`, Triton kernels, CUDA graphs). Compilers require static execution graphs; dynamically injecting arbitrary Python source code into the inner optimization loop breaks execution graphs, triggering continuous recompilation, graph breaks, and substantial deoptimization penalties.
+3. **Stochastic Optimization Trajectories:** Because LLM generation is inherently non-deterministic, independent training runs with OPAL may synthesize divergent optimizer updates, compromising bitwise experimental reproducibility unless every prompt, completion, and mutated AST is logged deterministically.
+4. **Lack of Theoretical Convergence Guarantees:** Classical non-convex optimization theory assumes invariant algorithmic update rules. Mid-trajectory code mutation invalidates standard Lyapunov and descent lemma proofs.
+
+---
+
+## 6. Distinction from the PathMNIST Federated Learning Study
 
 It is essential to distinguish the scope and methodology of Bai et al. from our PathMNIST experimental benchmark:
 - **Centralized vs. Federated:** OPAL is designed for a single centralized model where a central agent modifies local step code. Our PathMNIST study investigates decentralized federated learning across 5 distributed client nodes with sample-weighted aggregation.
