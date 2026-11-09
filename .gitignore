@@ -31,10 +31,22 @@ Thumbs.db
 wandb/
 
 # Large raw datasets and uncompressed memory-mapped binary arrays (200+ MB)
-# PathMNIST data can be re-acquired via `python scripts/initialize_experiment.py`
 /data/
 *.npz
 *.npy
 
-# Upstream reference framework (cloned independently)
+# Upstream reference framework
 third_party/PFLlib/
+
+# Large PyTorch checkpoints (preserve locally, do not commit to git)
+*.pt
+*.pth
+experiments/**/checkpoints/
+
+# Raw per-sample predictions (preserve locally, summarize via metrics)
+experiments/**/results/*predictions.jsonl
+
+# Quarantined interrupted, smoke, or abandoned attempts
+experiments/interrupted_attempts/
+experiments/seed_123/
+experiments/seed_42_attempt_2/

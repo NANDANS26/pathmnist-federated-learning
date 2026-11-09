@@ -1,0 +1,57 @@
+{
+  "study": "IndiaAI Fellowship 2026-27 Screening Submission",
+  "mentor": "Dr. Sachin D N, IIIT Bhopal",
+  "seed": 2026,
+  "git_commit_hash": "64ce6da727c8f039b069ff030759e33f74abd69f",
+  "model_architecture": "CompactPathCNN",
+  "trainable_parameters": 36425,
+  "hyperparameters": {
+    "num_clients": 5,
+    "dirichlet_alpha": 0.3,
+    "noisy_client": "Client 5",
+    "noisy_client_index": 4,
+    "noise_rate": 0.4,
+    "noise_type": "symmetric_deterministic_modulo_9",
+    "communication_rounds": 30,
+    "local_epochs": 2,
+    "batch_size": 32,
+    "learning_rate": 0.01,
+    "fedprox_mu": 0.01
+  },
+  "checksums": {
+    "dataset_sha256": "81823f52dc622e69db2db4c72f8e8e617938dd6864d3c1f23d4e49724a28ea72",
+    "partition_manifest_sha256": "36a9150ac5bdf92747599c48e7c8471f366abe763761bf438997d6409118e923",
+    "validation_manifest_sha256": "9b860b4a3842cfa09ad873307c77e7debcde7f4973265b020e56f9bfc7b31b2a",
+    "noise_manifest_sha256": "77a9b64758f03493eb1e5c2610c787016152b6044e0484ab29c13413e1edceb9",
+    "initial_model_checkpoint_sha256": "61332264238872164782bb31d69b907b8b0bdd3f38fac2c0f5cc842ba1595309"
+  },
+  "timestamps": {
+    "seed_start_utc": "2026-11-09T07:16:38.928461+00:00",
+    "fedavg_start_utc": "2026-11-09T07:16:39.496334+00:00",
+    "fedavg_end_utc": "2026-11-09T07:42:51.005332+00:00",
+    "fedprox_start_utc": "2026-11-09T07:42:51.008528+00:00",
+    "fedprox_end_utc": "2026-11-09T09:12:18.754482+00:00",
+    "seed_end_utc": "2026-11-09T09:12:21.939049+00:00"
+  },
+  "timing_reconciliation": {
+    "fedavg": {
+      "wall_clock_total_seconds": 1571.509,
+      "wall_clock_minutes": 26.19,
+      "sum_round_durations_seconds": 1571.158,
+      "average_round_duration_seconds": 52.372,
+      "sum_client_training_seconds": 1538.74,
+      "eval_and_server_overhead_seconds": 32.769
+    },
+    "fedprox": {
+      "wall_clock_total_seconds": 5367.746,
+      "wall_clock_minutes": 89.46,
+      "sum_round_durations_seconds": 5367.298,
+      "average_round_duration_seconds": 178.91,
+      "sum_client_training_seconds": 5308.46,
+      "eval_and_server_overhead_seconds": 59.286
+    },
+    "data_prep_overhead_seconds": 0.492,
+    "total_seed_wall_clock_seconds": 6943.01,
+    "total_seed_wall_clock_minutes": 115.72
+  }
+}

@@ -1,0 +1,166 @@
+{
+  "seed": 3407,
+  "git_commit_hash": "64ce6da727c8f039b069ff030759e33f74abd69f",
+  "completed_rounds": 30,
+  "fedavg": {
+    "run_name": "fedavg_alpha0.3_noise40_seed3407",
+    "best_validation_round": 30,
+    "best_validation_accuracy": 0.62615,
+    "best_validation_loss": 0.97541,
+    "test_accuracy": 0.75195,
+    "test_macro_f1": 0.62139,
+    "test_balanced_accuracy": 0.65631,
+    "test_loss": 0.86999,
+    "per_class": {
+      "0": {
+        "precision": 0.84674,
+        "recall": 0.99103,
+        "f1_score": 0.91322,
+        "support": 1338
+      },
+      "1": {
+        "precision": 0.92366,
+        "recall": 1.0,
+        "f1_score": 0.96032,
+        "support": 847
+      },
+      "2": {
+        "precision": 0.09091,
+        "recall": 0.00885,
+        "f1_score": 0.01613,
+        "support": 339
+      },
+      "3": {
+        "precision": 0.7824,
+        "recall": 0.77129,
+        "f1_score": 0.77681,
+        "support": 634
+      },
+      "4": {
+        "precision": 0.88189,
+        "recall": 0.75749,
+        "f1_score": 0.81497,
+        "support": 1035
+      },
+      "5": {
+        "precision": 0.45687,
+        "recall": 0.87669,
+        "f1_score": 0.60069,
+        "support": 592
+      },
+      "6": {
+        "precision": 0.59395,
+        "recall": 0.76788,
+        "f1_score": 0.66981,
+        "support": 741
+      },
+      "7": {
+        "precision": 0.91667,
+        "recall": 0.05226,
+        "f1_score": 0.09888,
+        "support": 421
+      },
+      "8": {
+        "precision": 0.81395,
+        "recall": 0.68127,
+        "f1_score": 0.74172,
+        "support": 1233
+      }
+    },
+    "wall_clock_minutes": 54.7
+  },
+  "fedprox": {
+    "run_name": "fedprox_mu0.01_alpha0.3_noise40_seed3407",
+    "mu": 0.01,
+    "best_validation_round": 27,
+    "best_validation_accuracy": 0.62035,
+    "best_validation_loss": 0.98858,
+    "test_accuracy": 0.71671,
+    "test_macro_f1": 0.59565,
+    "test_balanced_accuracy": 0.63183,
+    "test_loss": 0.95529,
+    "per_class": {
+      "0": {
+        "precision": 0.84957,
+        "recall": 0.97085,
+        "f1_score": 0.90617,
+        "support": 1338
+      },
+      "1": {
+        "precision": 0.75423,
+        "recall": 1.0,
+        "f1_score": 0.8599,
+        "support": 847
+      },
+      "2": {
+        "precision": 0.04444,
+        "recall": 0.0059,
+        "f1_score": 0.01042,
+        "support": 339
+      },
+      "3": {
+        "precision": 0.72452,
+        "recall": 0.82965,
+        "f1_score": 0.77353,
+        "support": 634
+      },
+      "4": {
+        "precision": 0.81497,
+        "recall": 0.55749,
+        "f1_score": 0.66208,
+        "support": 1035
+      },
+      "5": {
+        "precision": 0.4475,
+        "recall": 0.87838,
+        "f1_score": 0.59293,
+        "support": 592
+      },
+      "6": {
+        "precision": 0.62595,
+        "recall": 0.66397,
+        "f1_score": 0.6444,
+        "support": 741
+      },
+      "7": {
+        "precision": 0.82,
+        "recall": 0.09739,
+        "f1_score": 0.1741,
+        "support": 421
+      },
+      "8": {
+        "precision": 0.80114,
+        "recall": 0.68289,
+        "f1_score": 0.7373,
+        "support": 1233
+      }
+    },
+    "wall_clock_minutes": 41.78
+  },
+  "paired_delta": {
+    "test_accuracy_delta": -0.03524,
+    "test_macro_f1_delta": -0.02574,
+    "test_balanced_accuracy_delta": -0.02448
+  },
+  "timing_reconciliation": {
+    "fedavg": {
+      "wall_clock_total_seconds": 3282.213,
+      "wall_clock_minutes": 54.7,
+      "sum_round_durations_seconds": 3281.686,
+      "average_round_duration_seconds": 109.39,
+      "sum_client_training_seconds": 3215.265,
+      "eval_and_server_overhead_seconds": 66.948
+    },
+    "fedprox": {
+      "wall_clock_total_seconds": 2506.632,
+      "wall_clock_minutes": 41.78,
+      "sum_round_durations_seconds": 2506.213,
+      "average_round_duration_seconds": 83.54,
+      "sum_client_training_seconds": 2455.374,
+      "eval_and_server_overhead_seconds": 51.258
+    },
+    "data_prep_overhead_seconds": 0.756,
+    "total_seed_wall_clock_seconds": 5791.355,
+    "total_seed_wall_clock_minutes": 96.52
+  }
+}

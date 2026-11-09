@@ -1,0 +1,14 @@
+{
+  "status": "COMPLETED",
+  "seed": 123,
+  "attempt": 2,
+  "current_stage": "FINISHED",
+  "start_utc": "2026-11-09T05:37:36.813317+00:00",
+  "last_update_utc": "2026-11-09T07:15:42.302012+00:00",
+  "fedavg_completed_rounds": 30,
+  "fedavg_wall_clock_minutes": 54.66,
+  "fedprox_completed_rounds": 30,
+  "fedprox_wall_clock_minutes": 43.38,
+  "end_utc": "2026-11-09T07:15:42.301012+00:00",
+  "total_seed_wall_clock_minutes": 98.09
+}
